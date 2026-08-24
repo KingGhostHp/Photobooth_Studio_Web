@@ -5,10 +5,10 @@ export default function Footer({ setCurrentTab }) {
   return (
     <footer className="bg-slate-900 text-slate-300 pt-16 pb-8 border-t border-slate-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-8 space-y-12">
-        
+
         {/* Main Footer Multi-Column Grid (Inspired by Cong Studio) */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          
+
           {/* Column 1: Brand Info */}
           <div className="space-y-4">
             <div className="flex items-center gap-3">
@@ -92,7 +92,7 @@ export default function Footer({ setCurrentTab }) {
               </li>
               <li>
                 <button onClick={() => setCurrentTab('costumes')} className="hover:text-amber-400 transition-colors">
-                  • Cho Thuê Vest Nam & Tuxedo (Cộng Suit)
+                  • Cho Thuê Vest Nam & Tuxedo
                 </button>
               </li>
               <li>

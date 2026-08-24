@@ -1,51 +1,55 @@
 # Aura Studio & Costume Rental Web Application
 
-Ứng dụng Web App quản lý studio chụp ảnh & cho thuê trang phục cao cấp với thiết kế **Dark Luxury Aesthetic** (Obsidian Charcoal & Gold Accent).
+Ứng dụng Web App quản lý studio chụp ảnh & cho thuê trang phục cao cấp với thiết kế **Bright Clean Studio Layout** (chuẩn phong cách Cộng Studio `congstudio.vn`).
+
+---
+
+## 🗄️ Kiến Trúc Cơ Sở Dữ Liệu PostgreSQL (Relational Database)
+
+Dự án sử dụng cơ sở dữ liệu quan hệ **PostgreSQL 16** với cơ chế tự động tạo bảng (Auto-Migration) và nạp dữ liệu mẫu (Seeding) khi khởi chạy:
+
+### các Bảng Chính (Database Tables):
+1. **`costumes`**: Quản lý trang phục cho thuê (Mã SP, tên, danh mục, giá thuê/ngày, tiền cọc, số lượng khả dụng, tags, trạng thái kho).
+2. **`orders`**: Quản lý đơn đặt lịch & thuê đồ (Mã đơn `AUR-YYYYMMDD-XXX`, tên khách, SĐT, gói chụp/sản phẩm, ngày chụp, ca giờ, tổng tiền, cọc 30%, phụ phí phạt, trạng thái thanh toán & booking).
+
+---
 
 ## 📁 Cấu Trúc Dự Án (Folder Architecture)
-
-Dự án được phân chia rõ ràng thành 2 thư mục độc lập:
 
 ```text
 Photobooth_Studio_Web/
 ├── frontend/                   # Frontend SPA (React + Vite + Tailwind CSS v4)
 │   ├── src/
 │   │   ├── components/        # Common, Customer Portal, Admin CMS components
-│   │   ├── data/              # Mock Data (Costumes, Packages, Bookings, Photobooth)
-│   │   ├── index.css          # Design System CSS (Dark Luxury tokens & Glassmorphism)
-│   │   └── App.jsx            # Dynamic View Controller (Customer & Admin views)
-│   ├── public/                # Public Static Assets & AI Generated Images
-│   ├── index.html
-│   ├── vite.config.js
-│   └── package.json
+│   │   ├── data/              # Static & Fallback Data
+│   │   ├── index.css          # Design System CSS (Bright Studio tokens)
+│   │   └── App.jsx            # Dynamic View Controller
+│   ├── Dockerfile             # Multi-stage Docker build cho NGINX
+│   └── nginx.conf             # NGINX reverse proxy & SPA router
 │
-├── backend/                    # Backend REST API Service (Node.js + Express)
+├── backend/                    # Backend REST API Service (Node.js + Express + PostgreSQL)
 │   ├── src/
-│   │   └── server.js          # Express API server (Costumes, Orders, Admin stats)
-│   ├── .env                   # Environment configurations (PORT=5000, CLIENT_URL)
-│   └── package.json
+│   │   ├── db.js              # PostgreSQL Pool & Auto-Migration / Seeding
+│   │   └── server.js          # Express REST API Endpoints
+│   ├── Dockerfile             # Docker container cho Node.js API
+│   └── package.json           # Khai báo node-postgres (pg) dependency
 │
-└── package.json                # Root monorepo script helper
+├── docker-compose.yml          # Container orchestration (Frontend + Backend + PostgreSQL)
+├── start-studio-docker.bat     # File 1-Click khởi chạy toàn bộ hệ thống
+└── stop-studio-docker.bat      # File 1-Click dừng hệ thống
 ```
 
 ---
 
-## 🚀 Hướng Dẫn Khởi Chạy (Local Execution)
+## 🐳 Triển Khai Với Docker Compose
 
-### 1. Khởi chạy Frontend (React + Vite)
+Chạy lệnh 1-Click nhấp đúp vào **`start-studio-docker.bat`** hoặc gõ lệnh:
+
 ```bash
-cd frontend
-npm run dev
-# Mở trình duyệt tại: http://localhost:5173/ hoặc http://127.0.0.1:3000/
+docker compose up --build -d
 ```
 
-### 2. Khởi chạy Backend (Node.js + Express)
-```bash
-cd backend
-npm run dev
-# Máy chủ REST API sẵn sàng tại: http://localhost:5000/api/health
-```
-
-### 3. Lệnh khởi chạy nhanh từ thư mục gốc
-- Khởi chạy FE: `npm run dev:fe`
-- Khởi chạy BE: `npm run dev:be`
+Hệ thống sẽ khởi tạo 3 container:
+- **`aura-studio-frontend`**: NGINX Web Server tại `http://localhost` (Cổng 80)
+- **`aura-studio-backend`**: Node.js REST API tại `http://localhost:5000` (Cổng 5000)
+- **`aura-studio-db`**: PostgreSQL 16 Database tại `localhost:5432` (Cổng 5432) với Volume `postgres_data` lưu trữ dữ liệu vĩnh viễn.

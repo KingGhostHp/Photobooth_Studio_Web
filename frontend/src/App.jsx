@@ -21,6 +21,7 @@ import { INITIAL_ORDERS } from './data/bookings';
 
 export default function App() {
   const [currentTab, setCurrentTab] = useState('home');
+  const [selectedCostumeCategory, setSelectedCostumeCategory] = useState('all');
   const [activeAdminTab, setActiveAdminTab] = useState('dashboard');
   const [isAdminMode, setIsAdminMode] = useState(false);
   
@@ -93,9 +94,17 @@ export default function App() {
           <Header 
             currentTab={currentTab} 
             setCurrentTab={setCurrentTab} 
+            selectedCategory={selectedCostumeCategory}
+            onSelectCategory={(catId) => {
+              setSelectedCostumeCategory(catId);
+              setCurrentTab('costumes');
+            }}
             cartCount={cartItems.length}
             onOpenCart={() => setIsCartOpen(true)}
-            onOpenSearch={() => setCurrentTab('costumes')}
+            onOpenSearch={() => {
+              setSelectedCostumeCategory('all');
+              setCurrentTab('costumes');
+            }}
             isAdminMode={isAdminMode}
             setIsAdminMode={setIsAdminMode}
           />
@@ -106,7 +115,9 @@ export default function App() {
                 <HeroSection setCurrentTab={setCurrentTab} />
                 <CostumesCatalog 
                   onAddToCart={handleAddToCart} 
-                  onOpenMixMatch={() => setCurrentTab('mix-match')} 
+                  onOpenMixMatch={() => setCurrentTab('mix-match')}
+                  selectedCategory={selectedCostumeCategory}
+                  setSelectedCategory={setSelectedCostumeCategory}
                 />
                 <MixMatchBuilder onAddToCart={handleAddToCart} />
                 <PackagesSection onSelectPackageForBooking={handleSelectPackageForBooking} />
@@ -119,6 +130,8 @@ export default function App() {
               <CostumesCatalog 
                 onAddToCart={handleAddToCart} 
                 onOpenMixMatch={() => setCurrentTab('mix-match')} 
+                selectedCategory={selectedCostumeCategory}
+                setSelectedCategory={setSelectedCostumeCategory}
               />
             )}
 

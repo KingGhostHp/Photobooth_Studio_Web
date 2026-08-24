@@ -6,7 +6,7 @@ export default function HeroSection({ setCurrentTab }) {
     <section className="relative bg-gradient-to-b from-white via-amber-50/30 to-slate-50 py-16 lg:py-24 overflow-hidden border-b border-slate-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          
+
           {/* Left Content Column */}
           <div className="lg:col-span-7 space-y-8">
             {/* Top Badge */}
@@ -22,7 +22,7 @@ export default function HeroSection({ setCurrentTab }) {
                 <span className="text-gold-gradient">Nghệ Thuật & Đắng Cấp</span>
               </h1>
               <p className="text-slate-600 text-base sm:text-lg max-w-2xl leading-relaxed">
-                Hệ thống Studio chuyên nghiệp với hơn <strong>500+ bộ trang phục Áo Dài, Cổ Phục, Tuxedo Nam</strong> (Cộng Suit) và các gói chụp kỷ yếu, doanh nhân, phóng sự cưới trọn gói không phát sinh chi phí.
+                Hệ thống Studio chuyên nghiệp với hơn <strong>500+ bộ trang phục Áo Dài, Cổ Phục, Tuxedo Nam</strong> và các gói chụp kỷ yếu, doanh nhân, phóng sự cưới trọn gói không phát sinh chi phí.
               </p>
             </div>
 

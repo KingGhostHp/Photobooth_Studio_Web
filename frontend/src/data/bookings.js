@@ -44,7 +44,7 @@ export const INITIAL_ORDERS = [
     id: 'AUR-20260808-02',
     customerName: 'Trần Minh Quân',
     phone: '0988.111.222',
-    serviceType: 'Cho Thuê Trang Phục (Cộng Suit)',
+    serviceType: 'Cho Thuê Trang Phục',
     itemDetails: 'Bộ Tuxedo Velvet Navy Luxury (Size L)',
     bookingDate: '2026-08-09',
     timeSlot: 'Chỉ Thuê Đồ (Nhận 09/08 - Trả 11/08)',

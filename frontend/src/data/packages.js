@@ -11,7 +11,7 @@ export const PACKAGES_DATA = [
     retouchedCount: 10,
     image: '/images/costume_vest_luxury_1786199794453.png',
     features: [
-      'Bao gồm 2 bộ Vest Tuxedo / Đầm Dạ Hội cao cấp (Cộng Suit)',
+      'Bao gồm 2 bộ Vest Tuxedo / Đầm Dạ Hội cao cấp',
       'Chuyên viên Makeup & Làm tóc phong cách Doanh nhân',
       'Chụp 150-200 file ảnh gốc góc nghệ thuật',
       'Trả 10 file retouch da mịn chi tiết 4K',

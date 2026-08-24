@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { TIME_SLOTS, STAFF_LIST } from '../../data/bookings';
-import { Calendar as CalendarIcon, UserCheck, Clock, Shield, Sparkles, CheckCircle2 } from 'lucide-react';
+import { Calendar as CalendarIcon, UserCheck, Clock, Shield, Sparkles, CheckCircle2, User } from 'lucide-react';
+import CustomSelect from '../common/CustomSelect';
 
 export default function AdminCalendar() {
   const [selectedDate, setSelectedDate] = useState('2026-08-10');
@@ -56,18 +57,21 @@ export default function AdminCalendar() {
 
               {/* Staff Assignment Controls */}
               <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
-                <select
-                  value={currentAssignee || ''}
-                  onChange={(e) => assignStaffToSlot(slot.id, e.target.value)}
-                  className="w-full sm:w-64 bg-slate-50 border border-slate-200 p-3 rounded-2xl text-xs font-bold text-slate-900 focus:outline-none focus:border-amber-500"
-                >
-                  <option value="">-- Chưa Phân Công Ekip --</option>
-                  {STAFF_LIST.map((stf) => (
-                    <option key={stf.id} value={stf.id}>
-                      {stf.name} ({stf.role === 'PHOTOGRAPHER' ? 'Photo' : 'Makeup'})
-                    </option>
-                  ))}
-                </select>
+                <div className="w-full sm:w-64">
+                  <CustomSelect
+                    value={currentAssignee || ''}
+                    onChange={(val) => assignStaffToSlot(slot.id, val)}
+                    options={[
+                      { label: '-- Chưa Phân Công Ekip --', value: '' },
+                      ...STAFF_LIST.map(stf => ({
+                        label: `${stf.name} (${stf.role === 'PHOTOGRAPHER' ? 'Photo' : 'Makeup'})`,
+                        value: stf.id
+                      }))
+                    ]}
+                    placeholder="Chưa Phân Công Ekip"
+                    icon={User}
+                  />
+                </div>
 
                 {currentAssignee ? (
                   <span className="text-emerald-700 font-bold text-xs bg-emerald-50 border border-emerald-200 px-3 py-2 rounded-2xl flex items-center gap-1">
