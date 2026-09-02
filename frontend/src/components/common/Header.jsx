@@ -31,7 +31,7 @@ export default function Header({
         { label: 'Cho Thuê Phụ Kiện Chụp Ảnh', tab: 'costumes', category: 'phu-kien' }
       ]
     },
-    { id: 'mix-match', label: 'Thử Phối Đồ Ảo', highlight: true },
+    { id: 'lookup', label: 'Tra Cứu Đơn Thuê', highlight: true },
     {
       id: 'packages',
       label: 'Bảng Giá Gói Chụp',
@@ -41,7 +41,7 @@ export default function Header({
         { label: 'Bảng Giá Phóng Sự Cưới', tab: 'packages' }
       ]
     },
-    { id: 'photobooth', label: 'Photobooth Y2K' },
+    { id: 'photobooth', label: 'Photobooth' },
     { id: 'lookbook', label: 'Album Lookbook' },
     { id: 'booking', label: 'Đặt Lịch Ca Giờ' },
   ];

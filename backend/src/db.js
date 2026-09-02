@@ -5,6 +5,11 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL || 'postgresql://aura_admin:aura_password_2026@localhost:5432/aura_studio_db',
 });
 
+// Enforce UTF8 encoding on all PostgreSQL connections
+pool.on('connect', (client) => {
+  client.query("SET client_encoding TO 'UTF8'");
+});
+
 // Helper for running queries
 const query = (text, params) => pool.query(text, params);
 
@@ -15,6 +20,7 @@ const initDb = async () => {
     try {
       console.log('🔄 Connecting to PostgreSQL Database...');
       await pool.query('SELECT NOW()');
+      await pool.query("SET client_encoding TO 'UTF8'");
       console.log('✅ PostgreSQL Database connection established successfully!');
       break;
     } catch (err) {
@@ -65,9 +71,12 @@ const initDb = async () => {
         id VARCHAR(100) PRIMARY KEY,
         customer_name VARCHAR(255) NOT NULL,
         phone VARCHAR(50) NOT NULL,
+        email VARCHAR(255),
         service_type VARCHAR(255) NOT NULL,
         item_details TEXT,
         booking_date VARCHAR(50),
+        return_date VARCHAR(50),
+        rental_days INTEGER DEFAULT 1,
         time_slot VARCHAR(100),
         total_amount INTEGER NOT NULL,
         deposit_amount INTEGER NOT NULL,
@@ -79,6 +88,79 @@ const initDb = async () => {
         notes TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
+    `);
+
+    // Ensure columns exist if table was already created
+    await pool.query(`
+      ALTER TABLE orders ADD COLUMN IF NOT EXISTS email VARCHAR(255);
+      ALTER TABLE orders ADD COLUMN IF NOT EXISTS return_date VARCHAR(50);
+      ALTER TABLE orders ADD COLUMN IF NOT EXISTS rental_days INTEGER DEFAULT 1;
+      ALTER TABLE orders ADD COLUMN IF NOT EXISTS costume_ids JSONB DEFAULT '[]'::jsonb;
+      ALTER TABLE orders ADD COLUMN IF NOT EXISTS is_returned BOOLEAN DEFAULT FALSE;
+      ALTER TABLE orders ADD COLUMN IF NOT EXISTS start_date VARCHAR(50);
+      ALTER TABLE orders ADD COLUMN IF NOT EXISTS end_date VARCHAR(50);
+    `);
+
+    // 4. Create hero_banners table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS hero_banners (
+        id VARCHAR(100) PRIMARY KEY,
+        title TEXT NOT NULL,
+        subtitle TEXT,
+        tag VARCHAR(100),
+        badge VARCHAR(100),
+        image TEXT NOT NULL,
+        button_text VARCHAR(100),
+        button_link VARCHAR(255),
+        hotline VARCHAR(100),
+        is_active BOOLEAN DEFAULT true,
+        sort_order INTEGER DEFAULT 1,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
+    // 5. Create service_packages table (Gói Chụp Ảnh Concept)
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS service_packages (
+        id VARCHAR(100) PRIMARY KEY,
+        code VARCHAR(50) NOT NULL,
+        name VARCHAR(255) NOT NULL,
+        subtitle TEXT,
+        base_price_per_person INTEGER NOT NULL,
+        deposit INTEGER NOT NULL,
+        included_people INTEGER DEFAULT 1,
+        outfits_count INTEGER DEFAULT 1,
+        retouched_count INTEGER DEFAULT 10,
+        image TEXT,
+        features JSONB,
+        is_popular BOOLEAN DEFAULT false,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
+    // 6. Create service_addons table (Dịch Vụ Phụ Phí Đi Kèm)
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS service_addons (
+        id VARCHAR(100) PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        price INTEGER NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
+    // 7. Create photobooth_concepts table (Giá Khung Ảnh Photobooth)
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS photobooth_concepts (
+        id VARCHAR(100) PRIMARY KEY,
+        code VARCHAR(50) NOT NULL,
+        name VARCHAR(255) NOT NULL,
+        description TEXT,
+        price INTEGER NOT NULL,
+        image TEXT,
+        perks JSONB DEFAULT '["Miễn phí mượn 50+ phụ kiện", "File ảnh gốc + Video GIF hậu trường", "In 4 dải ảnh Strip Glossy cao cấp", "Quét mã QR lấy file siêu tốc"]'::jsonb,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+      ALTER TABLE photobooth_concepts ADD COLUMN IF NOT EXISTS perks JSONB DEFAULT '["Miễn phí mượn 50+ phụ kiện", "File ảnh gốc + Video GIF hậu trường", "In 4 dải ảnh Strip Glossy cao cấp", "Quét mã QR lấy file siêu tốc"]'::jsonb;
     `);
 
     // Seed Categories if Table is Empty
@@ -134,27 +216,164 @@ const initDb = async () => {
       }
     }
 
-    // Seed Initial Orders if Empty
-    const orderCountRes = await pool.query('SELECT COUNT(*) FROM orders');
-    if (parseInt(orderCountRes.rows[0].count, 10) === 0) {
-      console.log('🌱 Seeding initial orders data into PostgreSQL...');
-      const initialOrders = [
+    // Clean up any legacy mock orders or test orders with corrupted characters
+    await pool.query("DELETE FROM orders WHERE id LIKE 'AUR-20260808-%' OR customer_name LIKE '%?%' OR id = 'AUR-20260902-785'");
+
+    // Seed Initial Hero Banners if Empty
+    const bannerCountRes = await pool.query('SELECT COUNT(*) FROM hero_banners');
+    if (parseInt(bannerCountRes.rows[0].count, 10) === 0) {
+      console.log('🌱 Seeding initial hero banners into PostgreSQL...');
+      const initialBanners = [
         [
-          'AUR-20260808-01', 'Nguyễn Phương Anh', '0912.345.678', 'Chụp Ảnh Concept & Thuê Đồ',
-          'Áo Dài Hoàng Cúc Đỏ + Gói Profile Business', '2026-08-10', '08:30 - 10:00',
-          1750000, 500000, 0, 'DEPOSITED_30%', 'CONFIRMED', 'Nhiếp ảnh gia Tuấn Nguyễn', 'Stylist / Makeup Linh Trần', 'Khách hẹn trang điểm lúc 8:00'
+          'banner-1',
+          'KỶ YẾU MIỀN BẮC & CONCEPT ĐỘC BẢN',
+          'Hơn 100+ Concept Kỷ Yếu Học Sinh, Sinh Viên Đỉnh Cao • Trọn Gói Phim Ảnh & Trang Phục',
+          'Yearbook Concept 2026',
+          'Cộng Studio Style',
+          '/images/banners/banner1.png',
+          'Đặt Lịch Chụp Kỷ Yếu',
+          '#booking',
+          '0975.475.789 - 0968.475.789',
+          true,
+          1
         ],
         [
-          'AUR-20260808-02', 'Trần Minh Quân', '0988.111.222', 'Cho Thuê Trang Phục (Cộng Suit)',
-          'Bộ Tuxedo Velvet Navy Luxury (Size L)', '2026-08-09', 'Chỉ Thuê Đồ (Nhận 09/08 - Trả 11/08)',
-          380000, 700000, 0, 'FULLY_PAID', 'IN_PROGRESS', 'Không áp dụng', 'Không áp dụng', 'Đã cọc chứng minh thư'
+          'banner-2',
+          'CỔ PHỤC TRIỀU NGUYỄN & ÁO DÀI DI SẢN',
+          'Cho Thuê Trang Phục Cao Cấp Của Áo Dài Nhân & Cổ Phục Việt • Chuẩn Phom Dáng Hoàn Hảo',
+          'Bộ Sưu Tập Trang Phục 2026',
+          'Áo Dài Nhân',
+          '/images/banners/banner2.png',
+          'Xem Bộ Sưu Tập Trang Phục',
+          '#costumes',
+          '0975.397.923 - 0399.475.789',
+          true,
+          2
+        ],
+        [
+          'banner-3',
+          'TUXEDO NAM LUXURY & CHỤP ẢNH DOANH NHÂN',
+          'Vest Nhung Dạ Hội, Suit Chú Rể Cao Cấp & Gói Chụp Ảnh Nghệ Thuật Đẳng Cấp 5 Sao',
+          'Cộng Suit & High Fashion',
+          'Cộng Suit',
+          '/images/banners/banner3.png',
+          'Khám Phá Bảng Giá Suit',
+          '#pricing',
+          '0975.475.789',
+          true,
+          3
         ]
       ];
 
-      for (const row of initialOrders) {
+      for (const row of initialBanners) {
         await pool.query(
-          `INSERT INTO orders (id, customer_name, phone, service_type, item_details, booking_date, time_slot, total_amount, deposit_amount, penalty_fee, payment_status, booking_status, assigned_photographer, assigned_makeup, notes)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)`,
+          `INSERT INTO hero_banners (id, title, subtitle, tag, badge, image, button_text, button_link, hotline, is_active, sort_order)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+          row
+        );
+      }
+    }
+
+    // Seed Service Packages if Empty
+    const pkgCountRes = await pool.query('SELECT COUNT(*) FROM service_packages');
+    if (parseInt(pkgCountRes.rows[0].count, 10) === 0) {
+      console.log('🌱 Seeding initial service packages into PostgreSQL...');
+      const initialPkgs = [
+        [
+          'pkg-profile-vip', 'PKG-PROFILE', 'Gói Profile Doanh Nhân VIP',
+          'Phong cách Black Statement & Executive Elite', 1500000, 500000, 1, 2, 10,
+          '/images/costume_vest_luxury_1786199794453.png',
+          JSON.stringify([
+            'Bao gồm 2 bộ Vest Tuxedo / Đầm Dạ Hội cao cấp',
+            'Chuyên viên Makeup & Làm tóc phong cách Doanh nhân',
+            'Chụp 150-200 file ảnh gốc góc nghệ thuật',
+            'Trả 10 file retouch da mịn chi tiết 4K',
+            'Tặng 1 ảnh ép gỗ cao cấp để bàn (20x30cm)'
+          ]),
+          true
+        ],
+        [
+          'pkg-co-phuc', 'PKG-COPHUC', 'Gói Chân Dung Cổ Phục Việt Hoàng Gia',
+          'Nhật Bình & Giao Lĩnh Triều Nguyễn chính gốc', 1800000, 600000, 1, 2, 12,
+          '/images/costume_co_phuc_viet_1786199773916.png',
+          JSON.stringify([
+            'Bao gồm 2 bộ Cổ Phục Nhật Bình / Áo Giao Lĩnh chính gốc',
+            'Đầy đủ bộ phụ kiện: Trâm ngọc, quạt lụa, mấn xếp dát vàng',
+            'Trang điểm phong cách Cung đình xưa thanh thoát',
+            'Trả toàn bộ file gốc + 12 file retouch sắc nét',
+            'Tặng 1 khung ảnh mica vàng kim để bàn'
+          ]),
+          true
+        ],
+        [
+          'pkg-ky-yeu-group', 'PKG-KYYEU', 'Gói Chụp Kỷ Yếu Lớp / Nhóm',
+          'Urban School Vibes & Concept Học Đường', 350000, 1000000, 10, 2, 30,
+          '/images/costume_ao_dai_viet_1786199756012.png',
+          JSON.stringify([
+            'Áp dụng trọn gói cho nhóm / lớp học (350k/người)',
+            'Bao gồm 2 concept trang phục: Áo Cử Nhân + Áo Dài/Vest',
+            'Ekip 2 Nhiếp ảnh gia + 1 Hỗ trợ pose dáng vui nhộn',
+            'Bàn giao 500+ file ảnh gốc sắc nét qua Google Drive',
+            'Tặng 1 Video Highlight kỷ niệm dài 2 phút HD'
+          ]),
+          false
+        ]
+      ];
+
+      for (const row of initialPkgs) {
+        await pool.query(
+          `INSERT INTO service_packages (id, code, name, subtitle, base_price_per_person, deposit, included_people, outfits_count, retouched_count, image, features, is_popular)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
+          row
+        );
+      }
+    }
+
+    // Seed Service Addons if Empty
+    const addonCountRes = await pool.query('SELECT COUNT(*) FROM service_addons');
+    if (parseInt(addonCountRes.rows[0].count, 10) === 0) {
+      console.log('🌱 Seeding initial service addons into PostgreSQL...');
+      const initialAddons = [
+        ['addon-makeup', 'Makeup & Tóc Thêm 1 Lần', 250000],
+        ['addon-mv', 'Quay MV Kỷ Yếu Highlight 4K', 600000],
+        ['addon-photobook', 'In Album Photobook Bìa Da 20 Trang', 450000],
+        ['addon-drone', 'Quay Flycam Bối Cảnh Toàn Cảnh', 800000]
+      ];
+
+      for (const row of initialAddons) {
+        await pool.query(
+          `INSERT INTO service_addons (id, name, price) VALUES ($1, $2, $3)`,
+          row
+        );
+      }
+    }
+
+    // Seed Photobooth Concepts if Empty
+    const pbCountRes = await pool.query('SELECT COUNT(*) FROM photobooth_concepts');
+    if (parseInt(pbCountRes.rows[0].count, 10) === 0) {
+      console.log('🌱 Seeding initial photobooth concepts into PostgreSQL...');
+      const initialPb = [
+        [
+          'pb-korean-4cut', 'PB-KOREAN-01', 'Korean Vintage 4-Cut Frame',
+          'Chụp 4 ô phong cách thanh lịch Hàn Quốc viền vàng kim nhũ nhã nhặn.', 70000,
+          'https://images.unsplash.com/photo-1527529482837-4698179dc6ce?auto=format&fit=crop&w=800&q=80'
+        ],
+        [
+          'pb-y2k-cyber', 'PB-Y2K-02', 'Retro Y2K Cyberpunk Pink Strip',
+          'Phong cách dải ảnh Y2K cá tính, hiệu ứng màu neon độc đáo.', 60000,
+          'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=800&q=80'
+        ],
+        [
+          'pb-co-phuc-strip', 'PB-HERITAGE-03', 'Cổ Phục Hoàng Cung Vintage',
+          'Họa tiết hoa sen dát vàng tôn vinh nét đẹp văn hóa Việt.', 80000,
+          '/images/costume_co_phuc_viet_1786199773916.png'
+        ]
+      ];
+
+      for (const row of initialPb) {
+        await pool.query(
+          `INSERT INTO photobooth_concepts (id, code, name, description, price, image)
+           VALUES ($1, $2, $3, $4, $5, $6)`,
           row
         );
       }

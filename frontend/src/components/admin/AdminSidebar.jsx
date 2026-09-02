@@ -1,11 +1,13 @@
 import React from 'react';
-import { LayoutDashboard, Shirt, Calendar, ShoppingCart, LogOut, Camera, Users, FileText, Sparkles } from 'lucide-react';
+import { LayoutDashboard, Shirt, Calendar, ShoppingCart, LogOut, Camera, Users, FileText, Tag } from 'lucide-react';
 
 export default function AdminSidebar({ activeAdminTab, setActiveAdminTab, setIsAdminMode }) {
   const menuItems = [
     { id: 'dashboard', label: 'Tổng Quan Báo Cáo', icon: LayoutDashboard },
     { id: 'orders', label: 'Xử Lý Đơn Hàng & Phạt', icon: ShoppingCart, badge: 'Mới' },
     { id: 'inventory', label: 'Quản Lý Kho Trang Phục', icon: Shirt },
+    { id: 'photobooth', label: 'Quản Lý Photobooth', icon: Camera, badge: 'Hot' },
+    { id: 'pricing', label: 'Quản Lý Bảng Giá Dịch Vụ', icon: Tag },
     { id: 'calendar', label: 'Lịch Ca Chụp & Nhân Sự', icon: Calendar },
     { id: 'cms', label: 'Quản Lý Banner & Lookbook', icon: FileText },
   ];

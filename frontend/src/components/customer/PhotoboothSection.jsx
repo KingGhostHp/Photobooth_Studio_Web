@@ -1,9 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { PHOTOBOOTH_CONCEPTS } from '../../data/photobooth';
 import { Camera, Sparkles, CheckCircle, Calendar, ArrowRight } from 'lucide-react';
 
 export default function PhotoboothSection({ onBookPhotobooth }) {
+  const [concepts, setConcepts] = useState(PHOTOBOOTH_CONCEPTS);
   const [selectedConcept, setSelectedConcept] = useState(PHOTOBOOTH_CONCEPTS[0]);
+
+  useEffect(() => {
+    fetch('/api/photobooth')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.data.length > 0) {
+          setConcepts(data.data);
+          setSelectedConcept(data.data[0]);
+        }
+      })
+      .catch(err => console.warn('Using fallback photobooth concepts:', err));
+  }, []);
 
   return (
     <section className="py-16 bg-white border-b border-slate-200">
@@ -11,12 +24,12 @@ export default function PhotoboothSection({ onBookPhotobooth }) {
         
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto space-y-3">
-          <span className="badge-gold">Chụp Ảnh Nhanh Y2K</span>
+          <span className="badge-gold">Chụp Ảnh Cabin Tự Động</span>
           <h2 className="text-3xl sm:text-4xl font-extrabold font-serif-title text-slate-900">
-            Aura Photobooth Studio Y2K
+            Aura Photobooth Studio
           </h2>
           <p className="text-slate-600 text-sm">
-            Trải nghiệm cabin chụp ảnh tự động phong cách Hàn Quốc & Retro Y2K. In ảnh liền sau 30 giây kèm QR tải file GIF & video hiệu ứng.
+            Trải nghiệm cabin chụp ảnh tự động phong cách Hàn Quốc & Đa dạng Concept. In ảnh liền sau 30 giây kèm QR tải file GIF & video hiệu ứng.
           </p>
         </div>
 
@@ -42,7 +55,7 @@ export default function PhotoboothSection({ onBookPhotobooth }) {
 
             {/* Concept Thumbnails List */}
             <div className="grid grid-cols-3 gap-3">
-              {PHOTOBOOTH_CONCEPTS.map((concept) => (
+              {concepts.map((concept) => (
                 <button
                   key={concept.id}
                   onClick={() => setSelectedConcept(concept)}
@@ -52,7 +65,7 @@ export default function PhotoboothSection({ onBookPhotobooth }) {
                       : 'border-slate-200 bg-white hover:border-slate-300'
                   }`}
                 >
-                  <img src={concept.image} alt={concept.name} className="w-full h-16 object-cover rounded-xl mb-1.5" />
+                  <img src={concept.image || 'https://images.unsplash.com/photo-1527529482837-4698179dc6ce?auto=format&fit=crop&w=800&q=80'} alt={concept.name} className="w-full h-16 object-cover rounded-xl mb-1.5" />
                   <span className="text-[11px] font-bold text-slate-900 block line-clamp-1">{concept.name}</span>
                 </button>
               ))}
@@ -67,7 +80,7 @@ export default function PhotoboothSection({ onBookPhotobooth }) {
                 Gói Chụp Cabin {selectedConcept.name}
               </h3>
               <p className="text-slate-600 text-xs leading-relaxed">
-                Cabin chụp 1-6 người với hệ thống đèn studio chuẩn beauty, đạo cụ hóa trang đa dạng (kính mát, tai mèo, mũ cừu, đạo cụ sinh nhật).
+                {selectedConcept.description || 'Cabin chụp 1-6 người với hệ thống đèn studio chuẩn beauty, đạo cụ hóa trang đa dạng.'}
               </p>
             </div>
 
@@ -76,7 +89,7 @@ export default function PhotoboothSection({ onBookPhotobooth }) {
               <div>
                 <span className="text-xs text-amber-800 font-bold uppercase block">Mức Giá Vé Chụp / 1 Lượt (4 Strip Prints):</span>
                 <strong className="text-3xl font-extrabold text-amber-900 font-serif-title">
-                  {selectedConcept.price.toLocaleString('vi-VN')} VNĐ
+                  {(Number(selectedConcept.price) || 0).toLocaleString('vi-VN')} VNĐ
                 </strong>
               </div>
               <span className="text-xs text-emerald-700 bg-emerald-100 border border-emerald-200 font-bold px-3 py-1 rounded-full">
@@ -87,23 +100,18 @@ export default function PhotoboothSection({ onBookPhotobooth }) {
             {/* Props Checklist */}
             <div className="space-y-2 text-xs">
               <span className="font-bold text-slate-900 block">Đặc Quyền Đi Kèm Lượt Chụp:</span>
-              <div className="grid grid-cols-2 gap-2 text-slate-700">
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-amber-600" />
-                  <span>Miễn phí mượn 50+ phụ kiện</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-amber-600" />
-                  <span>File ảnh gốc + Video GIF hậu trường</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-amber-600" />
-                  <span>In 4 dải ảnh Strip Glossy cao cấp</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-amber-600" />
-                  <span>Quét mã QR lấy file siêu tốc</span>
-                </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-slate-700">
+                {(Array.isArray(selectedConcept.perks) && selectedConcept.perks.length > 0 ? selectedConcept.perks : [
+                  'Miễn phí mượn 50+ phụ kiện',
+                  'File ảnh gốc + Video GIF hậu trường',
+                  'In 4 dải ảnh Strip Glossy cao cấp',
+                  'Quét mã QR lấy file siêu tốc'
+                ]).map((perk, idx) => (
+                  <div key={idx} className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4 text-amber-600 flex-shrink-0" />
+                    <span className="text-slate-700">{perk}</span>
+                  </div>
+                ))}
               </div>
             </div>
 

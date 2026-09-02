@@ -23,56 +23,7 @@ export const STAFF_LIST = [
   { id: 'stf-4', name: 'Makeup Artist Mai Phương', role: 'MAKEUP_ARTIST', rating: 4.9, avatar: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=400&q=80' },
 ];
 
-export const INITIAL_ORDERS = [
-  {
-    id: 'AUR-20260808-01',
-    customerName: 'Nguyễn Phương Anh',
-    phone: '0912.345.678',
-    serviceType: 'Chụp Ảnh Concept & Thuê Đồ',
-    itemDetails: 'Áo Dài Hoàng Cúc Đỏ + Gói Profile Business',
-    bookingDate: '2026-08-10',
-    timeSlot: '08:30 - 10:00',
-    totalAmount: 1750000,
-    depositAmount: 500000,
-    paymentStatus: 'DEPOSITED_30%',
-    bookingStatus: 'CONFIRMED',
-    assignedPhotographer: 'Nhiếp ảnh gia Tuấn Nguyễn',
-    assignedMakeup: 'Stylist / Makeup Linh Trần',
-    createdAt: '2026-08-08 14:20'
-  },
-  {
-    id: 'AUR-20260808-02',
-    customerName: 'Trần Minh Quân',
-    phone: '0988.111.222',
-    serviceType: 'Cho Thuê Trang Phục',
-    itemDetails: 'Bộ Tuxedo Velvet Navy Luxury (Size L)',
-    bookingDate: '2026-08-09',
-    timeSlot: 'Chỉ Thuê Đồ (Nhận 09/08 - Trả 11/08)',
-    totalAmount: 380000,
-    depositAmount: 700000,
-    paymentStatus: 'FULLY_PAID',
-    bookingStatus: 'IN_PROGRESS',
-    assignedPhotographer: 'Không áp dụng',
-    assignedMakeup: 'Không áp dụng',
-    createdAt: '2026-08-08 10:15'
-  },
-  {
-    id: 'AUR-20260808-03',
-    customerName: 'Lê Thị Thu Thảo',
-    phone: '0934.567.890',
-    serviceType: 'Chụp Cổ Phục & Thử Phối Đồ',
-    itemDetails: 'Cổ Phục Nhật Bình + Quạt Lụa + Trâm Ngọc',
-    bookingDate: '2026-08-12',
-    timeSlot: '13:30 - 15:00',
-    totalAmount: 2300000,
-    depositAmount: 700000,
-    paymentStatus: 'UNPAID',
-    bookingStatus: 'PENDING_CONFIRM',
-    assignedPhotographer: 'Nhiếp ảnh gia Hoàng Nam',
-    assignedMakeup: 'Makeup Artist Mai Phương',
-    createdAt: '2026-08-08 16:45'
-  }
-];
+export const INITIAL_ORDERS = [];
 
 export const INITIAL_LOOKBOOK = [
   {

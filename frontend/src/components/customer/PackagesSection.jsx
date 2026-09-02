@@ -1,10 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { PACKAGES_DATA, ADDONS_LIST } from '../../data/packages';
 import { Check, Calendar, Users, Sparkles, Sliders, ArrowRight } from 'lucide-react';
 
 export default function PackagesSection({ onSelectPackageForBooking }) {
   const [personCount, setPersonCount] = useState(1);
   const [selectedAddons, setSelectedAddons] = useState([]);
+  const [packages, setPackages] = useState(PACKAGES_DATA);
+  const [addonsList, setAddonsList] = useState(ADDONS_LIST);
+
+  useEffect(() => {
+    fetch('/api/packages')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.data.length > 0) setPackages(data.data);
+      })
+      .catch(err => console.warn('Using fallback packages:', err));
+
+    fetch('/api/addons')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.data.length > 0) setAddonsList(data.data);
+      })
+      .catch(err => console.warn('Using fallback addons:', err));
+  }, []);
 
   const toggleAddon = (addonId) => {
     if (selectedAddons.includes(addonId)) {
@@ -17,7 +35,7 @@ export default function PackagesSection({ onSelectPackageForBooking }) {
   const calculatePackageTotal = (basePricePerPerson) => {
     let addonTotal = 0;
     selectedAddons.forEach((id) => {
-      const found = ADDONS_LIST.find((a) => a.id === id);
+      const found = addonsList.find((a) => a.id === id);
       if (found) addonTotal += found.price;
     });
     return basePricePerPerson * personCount + addonTotal;
@@ -70,7 +88,7 @@ export default function PackagesSection({ onSelectPackageForBooking }) {
           <div className="space-y-2">
             <label className="text-xs font-bold uppercase text-slate-500 block">Tùy Chọn Dịch Vụ Cộng Thêm (Add-ons):</label>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              {ADDONS_LIST.map((addon) => {
+              {addonsList.map((addon) => {
                 const isSelected = selectedAddons.includes(addon.id);
                 return (
                   <button
@@ -93,7 +111,7 @@ export default function PackagesSection({ onSelectPackageForBooking }) {
 
         {/* Pricing Cards Grid (Bright Studio Vertical Card Design - Cong Studio Style) */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {PACKAGES_DATA.map((pkg) => {
+          {packages.map((pkg) => {
             const calculatedTotal = calculatePackageTotal(pkg.basePricePerPerson);
             return (
               <div

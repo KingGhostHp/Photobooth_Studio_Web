@@ -29,11 +29,11 @@ export default function HeroSection({ setCurrentTab }) {
             {/* CTA Buttons */}
             <div className="flex flex-wrap items-center gap-4 pt-2">
               <button
-                onClick={() => setCurrentTab('mix-match')}
+                onClick={() => setCurrentTab('costumes')}
                 className="btn-gold px-7 py-3.5 text-sm font-bold shadow-lg"
               >
-                <Sparkles className="w-4.5 h-4.5" />
-                <span>Thử Phối Đồ Ảo (Mix & Match)</span>
+                <Shirt className="w-4.5 h-4.5" />
+                <span>Xem Kho Trang Phục (500+ Mẫu)</span>
               </button>
 
               <button

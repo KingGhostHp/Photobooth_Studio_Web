@@ -1,26 +1,78 @@
 import React, { useState } from 'react';
 import { TIME_SLOTS, SHOOT_TYPES } from '../../data/bookings';
-import { Calendar, Clock, User, Phone, CheckCircle, QrCode, Sparkles } from 'lucide-react';
+import { Calendar, Clock, User, Phone, Mail, CheckCircle, QrCode, Sparkles } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
-export default function BookingSlotSection({ selectedPackage, onBookingComplete }) {
-  const [selectedDate, setSelectedDate] = useState('2026-08-10');
+export default function BookingSlotSection({ selectedPackage, onCompleteBooking, onBookingComplete }) {
+  // Today date formatted
+  const todayStr = new Date().toISOString().split('T')[0];
+
+  const [selectedDate, setSelectedDate] = useState(todayStr);
   const [selectedSlot, setSelectedSlot] = useState(TIME_SLOTS[0]);
   const [selectedType, setSelectedType] = useState(SHOOT_TYPES[0]);
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
+  const [customerEmail, setCustomerEmail] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const depositPrice = selectedPackage ? selectedPackage.basePricePerPerson * 0.3 : 300000;
+  const totalPrice = selectedPackage ? (selectedPackage.basePricePerPerson || selectedPackage.price || 1500000) : 1200000;
+  const depositPrice = selectedPackage && selectedPackage.deposit ? selectedPackage.deposit : Math.round(totalPrice * 0.3);
 
-  const handleSubmitBooking = (e) => {
+  const handleSubmitBooking = async (e) => {
     e.preventDefault();
-    setIsSuccess(true);
-    confetti({
-      particleCount: 120,
-      spread: 80,
-      origin: { y: 0.6 }
-    });
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+
+    try {
+      const orderPayload = {
+        customerName: customerName,
+        phone: customerPhone,
+        email: customerEmail,
+        serviceType: selectedPackage ? `Gói Chụp: ${selectedPackage.name}` : `Dịch Vụ: ${selectedType.name}`,
+        itemDetails: selectedPackage
+          ? `${selectedPackage.name} - ${selectedPackage.subtitle || ''}`
+          : selectedType.name,
+        bookingDate: selectedDate,
+        returnDate: selectedDate,
+        rentalDays: 1,
+        timeSlot: selectedSlot.time,
+        totalAmount: totalPrice,
+        depositAmount: depositPrice,
+        penaltyFee: 0,
+        paymentStatus: 'DEPOSITED_30%',
+        bookingStatus: 'CONFIRMED',
+        assignedPhotographer: 'Chưa phân công',
+        assignedMakeup: 'Chưa phân công',
+        notes: `Khách đặt lịch ca ${selectedSlot.time} ngày ${selectedDate}. Email: ${customerEmail}`
+      };
+
+      const res = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(orderPayload)
+      });
+
+      const resData = await res.json();
+      if (resData.success && resData.data) {
+        const callback = onCompleteBooking || onBookingComplete;
+        if (callback) {
+          callback(resData.data);
+        }
+      }
+
+      setIsSuccess(true);
+      confetti({
+        particleCount: 120,
+        spread: 80,
+        origin: { y: 0.6 }
+      });
+      setIsSubmitting(false);
+    } catch (err) {
+      console.error('Lỗi khi lưu lịch đặt:', err);
+      alert('Có lỗi xảy ra khi lưu lịch đặt. Vui lòng thử lại!');
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -99,7 +151,7 @@ export default function BookingSlotSection({ selectedPackage, onBookingComplete 
                 {/* 3. Customer Info */}
                 <div className="space-y-4 pt-4 border-t border-slate-100">
                   <label className="text-xs font-bold text-slate-800 uppercase block">4. Thông Tin Khách Hàng:</label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div className="relative">
                       <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                       <input
@@ -118,6 +170,17 @@ export default function BookingSlotSection({ selectedPackage, onBookingComplete 
                         placeholder="Số điện thoại Zalo *"
                         value={customerPhone}
                         onChange={(e) => setCustomerPhone(e.target.value)}
+                        className="w-full bg-slate-50 border border-slate-200 text-xs pl-10 pr-4 py-3 rounded-2xl focus:outline-none focus:border-amber-500"
+                        required
+                      />
+                    </div>
+                    <div className="relative">
+                      <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                      <input
+                        type="email"
+                        placeholder="Địa chỉ Email/Gmail *"
+                        value={customerEmail}
+                        onChange={(e) => setCustomerEmail(e.target.value)}
                         className="w-full bg-slate-50 border border-slate-200 text-xs pl-10 pr-4 py-3 rounded-2xl focus:outline-none focus:border-amber-500"
                         required
                       />

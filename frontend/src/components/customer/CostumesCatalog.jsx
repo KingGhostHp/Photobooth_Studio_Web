@@ -104,13 +104,13 @@ export default function CostumesCatalog({
 
             {/* Quick Consultation CTA Box */}
             <div className="flex flex-col sm:flex-row lg:flex-col gap-3 flex-shrink-0">
-              <button
-                onClick={onOpenMixMatch}
+              <a
+                href="tel:0975397923"
                 className="btn-gold px-6 py-3 text-xs font-bold justify-center"
               >
-                <Sparkles className="w-4 h-4" />
-                <span>Thử Phối Đồ Ảo (Live Preview)</span>
-              </button>
+                <Phone className="w-4 h-4" />
+                <span>Hotline Thuê Đồ: 0975.397.923</span>
+              </a>
 
               <a
                 href="https://zalo.me/0975397923"
@@ -256,7 +256,7 @@ export default function CostumesCatalog({
                     <div className="flex items-center justify-between gap-2">
                       <span className="text-[11px] font-bold text-slate-500 uppercase">{item.code}</span>
                       <div className="flex gap-1">
-                        {item.sizes.map((sz) => (
+                        {(Array.isArray(item.sizes) ? item.sizes : []).map((sz) => (
                           <span key={sz} className="text-[9px] bg-slate-100 text-slate-700 font-bold px-1.5 py-0.5 rounded">
                             {sz}
                           </span>
@@ -280,13 +280,13 @@ export default function CostumesCatalog({
                     <div>
                       <span className="text-[10px] text-slate-400 font-semibold block uppercase">Giá thuê / ngày</span>
                       <strong className="text-amber-700 font-extrabold text-base">
-                        {item.rentalPrice.toLocaleString('vi-VN')} VNĐ
+                        {(Number(item.rentalPrice) || 0).toLocaleString('vi-VN')} VNĐ
                       </strong>
                     </div>
                     <div className="text-right">
                       <span className="text-[10px] text-slate-400 font-semibold block uppercase">Đặt cọc</span>
                       <span className="text-slate-600 font-bold text-xs">
-                        {item.depositAmount.toLocaleString('vi-VN')}đ
+                        {(Number(item.depositAmount) || 0).toLocaleString('vi-VN')}đ
                       </span>
                     </div>
                   </div>

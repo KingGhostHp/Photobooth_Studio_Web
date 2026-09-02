@@ -100,6 +100,11 @@ export default function Footer({ setCurrentTab }) {
                   • Cho Thuê Phụ Kiện Chụp Ảnh & Decor
                 </button>
               </li>
+              <li>
+                <button onClick={() => setCurrentTab('lookup')} className="text-amber-400 hover:text-amber-300 font-semibold transition-colors">
+                  • 🔍 Tra Cứu Đơn Thuê & Lịch Hẹn
+                </button>
+              </li>
             </ul>
           </div>
 
