@@ -37,10 +37,10 @@ export default function HeroSection({ setCurrentTab }) {
               </button>
 
               <button
-                onClick={() => setCurrentTab('packages')}
+                onClick={() => setCurrentTab('combo')}
                 className="btn-outline-gold px-7 py-3.5 text-sm font-bold"
               >
-                <span>Xem Bảng Giá Gói Chụp</span>
+                <span>Xem Gói Chụp Combo</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>

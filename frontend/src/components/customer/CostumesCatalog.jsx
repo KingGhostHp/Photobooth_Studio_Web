@@ -39,16 +39,32 @@ export default function CostumesCatalog({
     fetchLiveCostumes();
   }, []);
 
-  // Active Category metadata
-  const currentCategoryDetail = CATEGORY_DETAILS[selectedCategory] || CATEGORY_DETAILS['all'];
-  const activeCategoryObj = categoryList.find(c => c.id === selectedCategory) || categoryList[0] || COSTUME_CATEGORIES[0];
+  // Active Category metadata with safe fallbacks
+  const currentCategoryDetail = (selectedCategory && CATEGORY_DETAILS[selectedCategory]) 
+    || CATEGORY_DETAILS['all'] 
+    || {
+      title: 'Kho Trang Phục Thuê Nghệ Thuật Aura Studio',
+      subtitle: 'Hơn 500+ mẫu Áo Dài, Cổ Phục Việt, Tuxedo Nam và Đầm Dạ Hội cao cấp.',
+      seoIntro: 'Aura Studio mang đến không gian cho thuê trang phục nghệ thuật chuyên nghiệp hàng đầu. Toàn bộ trang phục đều được tuyển chọn từ chất liệu cao cấp, chuẩn form may đo và được giặt hấp khử khuẩn 100% trước khi giao cho khách hàng.',
+      features: ['500+ Mẫu Mới 2026', 'Size Từ S Đến 7XL', 'Miễn Phí Phụ Kiện Đi Kèm', 'Hỗ Trợ Chỉnh Form Tận Nơi']
+    };
 
-  const filteredItems = itemsList.filter((item) => {
-    const matchCat = selectedCategory === 'all' || item.category === selectedCategory;
+  const activeCategoryObj = (Array.isArray(categoryList) ? categoryList.find(c => c?.id === selectedCategory) : null)
+    || (Array.isArray(categoryList) && categoryList[0])
+    || COSTUME_CATEGORIES[0]
+    || { id: 'all', name: 'Tất Cả Trang Phục' };
+
+  const safeCategoryName = activeCategoryObj?.name || 'Tất Cả Trang Phục';
+
+  const filteredItems = (Array.isArray(itemsList) ? itemsList : COSTUME_ITEMS).filter((item) => {
+    if (!item) return false;
+    const matchCat = !selectedCategory || selectedCategory === 'all' || item.category === selectedCategory;
     const matchGen = selectedGender === 'all' || item.gender === selectedGender;
-    const matchSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                        (item.description || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-                        (item.code || '').toLowerCase().includes(searchQuery.toLowerCase());
+    const sQuery = (searchQuery || '').toLowerCase().trim();
+    const matchSearch = !sQuery || 
+      (item.name || '').toLowerCase().includes(sQuery) || 
+      (item.description || '').toLowerCase().includes(sQuery) ||
+      (item.code || '').toLowerCase().includes(sQuery);
     return matchCat && matchGen && matchSearch;
   });
 
@@ -75,7 +91,7 @@ export default function CostumesCatalog({
           </button>
           <ChevronRight className="w-3.5 h-3.5 text-slate-300 flex-shrink-0" />
           <span className="text-amber-600 font-bold whitespace-nowrap">
-            {activeCategoryObj.name.toUpperCase()}
+            {safeCategoryName.toUpperCase()}
           </span>
         </nav>
 
@@ -94,11 +110,11 @@ export default function CostumesCatalog({
               </div>
 
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold font-serif-title text-slate-900 leading-tight">
-                {currentCategoryDetail.title}
+                {currentCategoryDetail.title || 'Kho Trang Phục Thuê Nghệ Thuật Aura Studio'}
               </h1>
 
               <p className="text-slate-600 text-xs sm:text-sm leading-relaxed">
-                {currentCategoryDetail.seoIntro}
+                {currentCategoryDetail.seoIntro || ''}
               </p>
             </div>
 
@@ -119,14 +135,14 @@ export default function CostumesCatalog({
                 className="bg-slate-900 text-white hover:bg-slate-800 px-6 py-3 rounded-2xl text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-md"
               >
                 <Phone className="w-4 h-4 text-amber-400" />
-                <span>Tư Vẫn Zalo: 0975.397.923</span>
+                <span>Tư Vấn Zalo: 0975.397.923</span>
               </a>
             </div>
           </div>
 
           {/* Feature Highlights Pills */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-4 border-t border-slate-200/60">
-            {currentCategoryDetail.features.map((feat, idx) => (
+            {(Array.isArray(currentCategoryDetail?.features) ? currentCategoryDetail.features : []).map((feat, idx) => (
               <div key={idx} className="flex items-center gap-2 text-xs font-bold text-slate-700 bg-white/80 p-2.5 rounded-xl border border-slate-200/80">
                 <Check className="w-4 h-4 text-emerald-600 flex-shrink-0" />
                 <span>{feat}</span>
@@ -149,12 +165,12 @@ export default function CostumesCatalog({
 
           <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
             {/* Category Tabs */}
-            <div className="flex flex-wrap items-center gap-2 w-full lg:w-auto">
+            <div className="flex items-center gap-2 w-full lg:w-auto overflow-x-auto pb-2 flex-nowrap sm:flex-wrap no-scrollbar">
               {categoryList.map((cat) => (
                 <button
                   key={cat.id}
                   onClick={() => setSelectedCategory && setSelectedCategory(cat.id)}
-                  className={`px-4 py-2 rounded-full text-xs font-bold transition-all ${
+                  className={`px-3.5 sm:px-4 py-2 rounded-full text-xs font-bold transition-all whitespace-nowrap flex-shrink-0 ${
                     selectedCategory === cat.id
                       ? 'bg-amber-600 text-white shadow-md shadow-amber-500/20'
                       : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
@@ -333,15 +349,17 @@ export default function CostumesCatalog({
                     <div className="space-y-2 pt-2 border-t border-slate-100 text-xs">
                       <div className="flex justify-between">
                         <span className="text-slate-500">Mã sản phẩm:</span>
-                        <strong className="text-slate-900">{detailModalItem.code}</strong>
+                        <strong className="text-slate-900">{detailModalItem.code || detailModalItem.id}</strong>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-slate-500">Kích cỡ có sẵn:</span>
-                        <strong className="text-slate-900">{detailModalItem.sizes.join(', ')}</strong>
+                        <strong className="text-slate-900">
+                          {Array.isArray(detailModalItem.sizes) ? detailModalItem.sizes.join(', ') : (detailModalItem.sizes || 'Free Size')}
+                        </strong>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-slate-500">Tình trạng kho:</span>
-                        <span className="text-emerald-600 font-bold">✓ Còn {detailModalItem.availableCount} bộ sẵn có</span>
+                        <span className="text-emerald-600 font-bold">✓ Còn {detailModalItem.availableCount || 1} bộ sẵn có</span>
                       </div>
                     </div>
                   </div>
@@ -349,11 +367,15 @@ export default function CostumesCatalog({
                   <div className="bg-amber-50 p-4 rounded-2xl border border-amber-200 space-y-3">
                     <div className="flex justify-between items-baseline">
                       <span className="text-xs text-slate-600 font-semibold">Giá thuê / 24H:</span>
-                      <strong className="text-lg text-amber-800 font-extrabold">{detailModalItem.rentalPrice.toLocaleString('vi-VN')} VNĐ</strong>
+                      <strong className="text-lg text-amber-800 font-extrabold">
+                        {(Number(detailModalItem.rentalPrice) || 0).toLocaleString('vi-VN')} VNĐ
+                      </strong>
                     </div>
                     <div className="flex justify-between text-xs text-slate-600">
                       <span>Tiền đặt cọc quy định:</span>
-                      <strong className="text-slate-900">{detailModalItem.depositAmount.toLocaleString('vi-VN')} VNĐ</strong>
+                      <strong className="text-slate-900">
+                        {(Number(detailModalItem.depositAmount) || 0).toLocaleString('vi-VN')} VNĐ
+                      </strong>
                     </div>
 
                     <button

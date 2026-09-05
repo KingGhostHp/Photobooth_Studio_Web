@@ -47,22 +47,22 @@ export default function Footer({ setCurrentTab }) {
             </h4>
             <ul className="space-y-2 text-xs text-slate-400">
               <li>
-                <button onClick={() => setCurrentTab('packages')} className="hover:text-amber-400 transition-colors">
+                <button onClick={() => setCurrentTab('combo')} className="hover:text-amber-400 transition-colors">
                   • Chụp Ảnh Kỷ Yếu Cấp 1, 2, 3 & Đại Học
                 </button>
               </li>
               <li>
-                <button onClick={() => setCurrentTab('packages')} className="hover:text-amber-400 transition-colors">
+                <button onClick={() => setCurrentTab('combo')} className="hover:text-amber-400 transition-colors">
                   • Tour Du Lịch Kỷ Yếu Trọn Gói
                 </button>
               </li>
               <li>
-                <button onClick={() => setCurrentTab('packages')} className="hover:text-amber-400 transition-colors">
+                <button onClick={() => setCurrentTab('combo')} className="hover:text-amber-400 transition-colors">
                   • Chụp Phóng Sự Cưới & Ăn Hỏi
                 </button>
               </li>
               <li>
-                <button onClick={() => setCurrentTab('packages')} className="hover:text-amber-400 transition-colors">
+                <button onClick={() => setCurrentTab('combo')} className="hover:text-amber-400 transition-colors">
                   • Chụp Ảnh Profile Doanh Nhân & Beauty
                 </button>
               </li>

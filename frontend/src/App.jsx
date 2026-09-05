@@ -5,9 +5,8 @@ import HeroSection from './components/customer/HeroSection';
 import HeroBannerCarousel from './components/customer/HeroBannerCarousel';
 import CostumesCatalog from './components/customer/CostumesCatalog';
 import OrderLookupSection from './components/customer/OrderLookupSection';
-import PackagesSection from './components/customer/PackagesSection';
+import ComboPackagesSection from './components/customer/ComboPackagesSection';
 import PhotoboothSection from './components/customer/PhotoboothSection';
-import BookingSlotSection from './components/customer/BookingSlotSection';
 import LookbookSection from './components/customer/LookbookSection';
 import CartDrawer from './components/customer/CartDrawer';
 
@@ -26,6 +25,7 @@ export default function App() {
   const [selectedCostumeCategory, setSelectedCostumeCategory] = useState('all');
   const [activeAdminTab, setActiveAdminTab] = useState('dashboard');
   const [isAdminMode, setIsAdminMode] = useState(false);
+  const [isAdminMobileMenuOpen, setIsAdminMobileMenuOpen] = useState(false);
   
   const [cartItems, setCartItems] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -51,6 +51,40 @@ export default function App() {
 
   useEffect(() => {
     fetchOrders();
+  }, []);
+
+  // 5-Second Visitor Retention Tracker (Lấy thời điểm 1 người truy cập web tối thiểu 5s tính là 1 lần)
+  useEffect(() => {
+    // Check if tracked in current browser session
+    const hasTrackedSession = sessionStorage.getItem('aura_tracked_visit_5s');
+    if (hasTrackedSession) return;
+
+    // Get or create persistent visitor ID
+    let visitorId = localStorage.getItem('aura_visitor_id');
+    if (!visitorId) {
+      visitorId = 'VISITOR-' + Math.random().toString(36).substring(2, 9).toUpperCase();
+      localStorage.setItem('aura_visitor_id', visitorId);
+    }
+
+    const timer = setTimeout(() => {
+      fetch('/api/analytics/track-visit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          visitorId,
+          duration: 5,
+          pageUrl: window.location.pathname + window.location.hash,
+          userAgent: navigator.userAgent
+        })
+      })
+        .then(res => res.json())
+        .then(() => {
+          sessionStorage.setItem('aura_tracked_visit_5s', 'true');
+        })
+        .catch(err => console.warn('Visitor tracking error:', err));
+    }, 5000); // 5000ms = 5 seconds
+
+    return () => clearTimeout(timer);
   }, []);
 
   const handleAddToCart = (item) => {
@@ -112,21 +146,30 @@ export default function App() {
           <AdminSidebar 
             activeAdminTab={activeAdminTab} 
             setActiveAdminTab={setActiveAdminTab} 
-            setIsAdminMode={setIsAdminMode} 
+            setIsAdminMode={setIsAdminMode}
+            isMobileOpen={isAdminMobileMenuOpen}
+            onCloseMobile={() => setIsAdminMobileMenuOpen(false)}
           />
           <div className="flex-1 flex flex-col min-w-0 bg-slate-900">
             <AdminHeader 
               activeAdminTab={activeAdminTab} 
               setIsAdminMode={setIsAdminMode} 
+              onToggleMobileMenu={() => setIsAdminMobileMenuOpen(!isAdminMobileMenuOpen)}
             />
-            <main className="p-6 sm:p-8 flex-1">
+            <main className="p-3 sm:p-6 lg:p-8 flex-1">
               {activeAdminTab === 'dashboard' && (
                 <AdminDashboard orders={orders} onNavigateTab={setActiveAdminTab} />
               )}
               {activeAdminTab === 'inventory' && <AdminInventory />}
               {activeAdminTab === 'photobooth' && <AdminPhotobooth />}
               {activeAdminTab === 'pricing' && <AdminPricing />}
-              {activeAdminTab === 'calendar' && <AdminCalendar />}
+              {activeAdminTab === 'calendar' && (
+                <AdminCalendar 
+                  orders={orders} 
+                  onUpdateOrder={handleUpdateOrder} 
+                  onRefreshOrders={fetchOrders} 
+                />
+              )}
               {activeAdminTab === 'orders' && (
                 <AdminOrders 
                   orders={orders} 
@@ -170,7 +213,7 @@ export default function App() {
             {currentTab === 'home' && (
               <>
                 <HeroBannerCarousel 
-                  onOpenBooking={() => setCurrentTab('booking')} 
+                  onOpenBooking={() => setCurrentTab('photobooth')} 
                   onSelectTab={(tab) => setCurrentTab(tab)} 
                 />
                 <HeroSection setCurrentTab={setCurrentTab} />
@@ -179,8 +222,8 @@ export default function App() {
                   selectedCategory={selectedCostumeCategory}
                   setSelectedCategory={setSelectedCostumeCategory}
                 />
-                <PackagesSection onSelectPackageForBooking={handleSelectPackageForBooking} />
-                <PhotoboothSection onBookingPhotobooth={() => setCurrentTab('booking')} />
+                <ComboPackagesSection onAddToCart={handleAddToCart} />
+                <PhotoboothSection onCompleteBooking={handleCompleteBooking} />
                 <OrderLookupSection />
                 <LookbookSection />
               </>
@@ -198,19 +241,12 @@ export default function App() {
               <OrderLookupSection />
             )}
 
-            {currentTab === 'packages' && (
-              <PackagesSection onSelectPackageForBooking={handleSelectPackageForBooking} />
+            {(currentTab === 'combo' || currentTab === 'packages') && (
+              <ComboPackagesSection onAddToCart={handleAddToCart} />
             )}
 
-            {currentTab === 'photobooth' && (
-              <PhotoboothSection onBookingPhotobooth={() => setCurrentTab('booking')} />
-            )}
-
-            {currentTab === 'booking' && (
-              <BookingSlotSection 
-                selectedPackage={selectedPackageForBooking} 
-                onCompleteBooking={handleCompleteBooking} 
-              />
+            {(currentTab === 'photobooth' || currentTab === 'booking') && (
+              <PhotoboothSection onCompleteBooking={handleCompleteBooking} />
             )}
 
             {currentTab === 'lookbook' && (
@@ -224,7 +260,7 @@ export default function App() {
             cartItems={cartItems}
             onRemoveFromCart={handleRemoveFromCart}
             onClearCart={() => setCartItems([])}
-            onProceedToBooking={() => setCurrentTab('booking')}
+            onProceedToBooking={() => setCurrentTab('combo')}
             onCompleteBooking={handleCompleteBooking}
           />
 
