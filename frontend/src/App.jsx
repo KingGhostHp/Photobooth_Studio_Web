@@ -19,6 +19,7 @@ import AdminOrders from './components/admin/AdminOrders';
 import AdminPhotobooth from './components/admin/AdminPhotobooth';
 import AdminPricing from './components/admin/AdminPricing';
 import AdminBanners from './components/admin/AdminBanners';
+import AdminPaymentSettings from './components/admin/AdminPaymentSettings';
 
 export default function App() {
   const [currentTab, setCurrentTab] = useState('home');
@@ -159,6 +160,9 @@ export default function App() {
             <main className="p-3 sm:p-6 lg:p-8 flex-1">
               {activeAdminTab === 'dashboard' && (
                 <AdminDashboard orders={orders} onNavigateTab={setActiveAdminTab} />
+              )}
+              {activeAdminTab === 'payment' && (
+                <AdminPaymentSettings orders={orders} onRefreshOrders={fetchOrders} />
               )}
               {activeAdminTab === 'inventory' && <AdminInventory />}
               {activeAdminTab === 'photobooth' && <AdminPhotobooth />}

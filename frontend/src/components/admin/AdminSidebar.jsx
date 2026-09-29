@@ -11,6 +11,7 @@ export default function AdminSidebar({
   const menuItems = [
     { id: 'dashboard', label: 'Tổng Quan Báo Cáo', icon: LayoutDashboard },
     { id: 'orders', label: 'Xử Lý Đơn Hàng & Phạt', icon: ShoppingCart, badge: 'Mới' },
+    { id: 'payment', label: 'Cấu Hình Ngân Hàng & Webhook', icon: Tag, badge: 'Tự Động' },
     { id: 'inventory', label: 'Quản Lý Kho Trang Phục', icon: Shirt },
     { id: 'photobooth', label: 'Quản Lý Photobooth', icon: Camera, badge: 'Hot' },
     { id: 'pricing', label: 'Quản Lý Bảng Giá Dịch Vụ', icon: Tag },

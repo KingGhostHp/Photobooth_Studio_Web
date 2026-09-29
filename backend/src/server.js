@@ -387,13 +387,29 @@ async function checkCostumeRentalConflict(costumeIds = [], startDateStr, rentalD
   const reqStart = startDateStr;
   const reqEnd = calculateEndDateIso(startDateStr, rentalDays);
 
-  // Query all active rental orders that have NOT been confirmed returned by Admin
+  // Clean up any stale uncompleted PENDING orders older than 10 minutes
+  try {
+    await query(`
+      DELETE FROM orders 
+      WHERE payment_status = 'PENDING' 
+        AND created_at < NOW() - INTERVAL '10 minutes'
+    `);
+  } catch (e) {
+    // Ignore error
+  }
+
+  // Query all active rental orders that have NOT been cancelled or confirmed returned
+  // Only orders that are confirmed paid/deposited (or currently active in 10-min payment session)
   const activeOrdersRes = await query(`
-    SELECT id, customer_name, phone, item_details, costume_ids, booking_date, return_date, rental_days, start_date, end_date, is_returned, booking_status
+    SELECT id, customer_name, phone, item_details, costume_ids, booking_date, return_date, rental_days, start_date, end_date, is_returned, booking_status, payment_status, created_at
     FROM orders
     WHERE (service_type LIKE '%Thuê%' OR service_type LIKE '%Trang Phục%')
       AND is_returned = FALSE
       AND booking_status NOT IN ('CANCELLED', 'RETURNED')
+      AND (
+        payment_status NOT IN ('PENDING', 'UNPAID')
+        OR (payment_status = 'PENDING' AND created_at >= NOW() - INTERVAL '10 minutes')
+      )
   `);
 
   for (const existing of activeOrdersRes.rows) {
@@ -410,11 +426,10 @@ async function checkCostumeRentalConflict(costumeIds = [], startDateStr, rentalD
       const existStart = existing.start_date || existing.booking_date;
       const existEnd = existing.end_date || calculateEndDateIso(existStart, existing.rental_days || 1);
 
-      // Conflict condition 1: Date ranges overlap
+      // Conflict condition: Date ranges overlap (Khoảng thời gian thuê bị trùng)
       const isDateOverlapping = (reqStart <= existEnd && reqEnd >= existStart);
 
-      // Conflict condition 2: Costume has not been confirmed returned by Admin
-      if (isDateOverlapping || !existing.is_returned) {
+      if (isDateOverlapping) {
         return {
           hasConflict: true,
           conflictingOrderId: existing.id,
@@ -422,7 +437,7 @@ async function checkCostumeRentalConflict(costumeIds = [], startDateStr, rentalD
           existingStart: existStart,
           existingEnd: existEnd,
           itemDetails: existing.item_details,
-          message: `Trang phục bạn chọn đang có khách thuê từ ngày ${existStart} đến ${existEnd} (chưa được Admin xác nhận trả đồ). Quý khách vui lòng chọn khoảng thời gian khác hoặc chọn trang phục khác!`
+          message: `Trang phục bạn chọn đang có khách thuê từ ngày ${existStart} đến ${existEnd}. Quý khách vui lòng chọn khoảng thời gian khác hoặc chọn trang phục khác!`
         };
       }
     }
@@ -1546,6 +1561,319 @@ app.get('/api/analytics/export-excel', async (req, res) => {
     res.send(buffer);
   } catch (err) {
     console.error('Error exporting excel:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+/* ==========================================================================
+   9. BANK CONFIGURATION & AUTOMATED PAYMENT WEBHOOK / CALLBACK (SePay/VietQR)
+   ========================================================================== */
+
+// 1. GET Current Bank Configuration (MB Bank, Vietcombank, ACB, etc.)
+app.get('/api/payment/bank-config', async (req, res) => {
+  try {
+    const result = await query('SELECT * FROM bank_configs WHERE id = $1', ['primary_bank']);
+    if (result.rows.length === 0) {
+      return res.json({
+        success: true,
+        data: {
+          id: 'primary_bank',
+          bankCode: 'MB',
+          bankBin: '970422',
+          bankName: 'MB Bank (Quân Đội)',
+          accountNumber: '0975397923',
+          accountHolder: 'AURA STUDIO',
+          qrTemplate: 'compact2',
+          qrType: 'dynamic',
+          customQrImage: null,
+          isAutoConfirmEnabled: true
+        }
+      });
+    }
+    const row = result.rows[0];
+    res.json({
+      success: true,
+      data: {
+        id: row.id,
+        bankCode: row.bank_code,
+        bankBin: row.bank_bin,
+        bankName: row.bank_name,
+        accountNumber: row.account_number,
+        accountHolder: row.account_holder,
+        qrTemplate: row.qr_template,
+        qrType: row.qr_type || 'dynamic',
+        customQrImage: row.custom_qr_image || null,
+        webhookApiKey: row.webhook_api_key,
+        isAutoConfirmEnabled: row.is_auto_confirm_enabled
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// 2. PUT Update Bank Configuration (Cho phép đổi STK, Ngân hàng, Upload QR ảnh riêng trong Admin)
+app.put('/api/payment/bank-config', async (req, res) => {
+  try {
+    const { bankCode, bankBin, bankName, accountNumber, accountHolder, qrTemplate, qrType, customQrImage, isAutoConfirmEnabled } = req.body;
+    const result = await query(`
+      UPDATE bank_configs SET
+        bank_code = COALESCE($1, bank_code),
+        bank_bin = COALESCE($2, bank_bin),
+        bank_name = COALESCE($3, bank_name),
+        account_number = COALESCE($4, account_number),
+        account_holder = COALESCE($5, account_holder),
+        qr_template = COALESCE($6, qr_template),
+        qr_type = COALESCE($7, qr_type),
+        custom_qr_image = $8,
+        is_auto_confirm_enabled = COALESCE($9, is_auto_confirm_enabled),
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = 'primary_bank'
+      RETURNING *;
+    `, [bankCode, bankBin, bankName, accountNumber, accountHolder, qrTemplate, qrType, customQrImage, isAutoConfirmEnabled]);
+
+    res.json({ success: true, message: 'Cập nhật tài khoản ngân hàng & mã QR nhận tiền thành công!', data: result.rows[0] });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// 3. POST Payment Webhook Endpoint (Chuẩn SePay, Casso, PayOS & Ngân Hàng Callback)
+app.post('/api/payment/webhook', async (req, res) => {
+  try {
+    const payload = req.body || {};
+    console.log('🔔 [PAYMENT WEBHOOK RECEIVED]:', JSON.stringify(payload));
+
+    // SePay / Casso / Standard payload parser
+    const content = (payload.content || payload.description || payload.transaction_content || payload.orderCode || '').toString();
+    const amountIn = Number(payload.transferAmount || payload.amount || payload.amount_in || payload.money || 0);
+    const transactionId = payload.id || payload.transaction_id || payload.referenceCode || `TXN-${Date.now()}`;
+    const accountNumber = payload.accountNumber || payload.account_number || payload.subAccount || '0975397923';
+    const gateway = payload.gateway || payload.bank_brand_name || 'SEPAY/VIETQR';
+
+    // Regex extract Order ID from content: e.g. "AURA 832", "AUR-20260905-832", "AURA-20260905-832", "AUR 832"
+    let matchedOrderId = null;
+    const orderMatches = content.match(/(AUR|AURA|DH|ORD)[-\s_]?([0-9]{4,14}|[0-9]{3,8})/i);
+    
+    // Find matching order in DB
+    const allOrdersRes = await query('SELECT * FROM orders ORDER BY created_at DESC');
+    const allOrders = allOrdersRes.rows;
+
+    let targetOrder = null;
+
+    // Direct ID match in content
+    for (const ord of allOrders) {
+      const cleanId = ord.id.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+      const cleanContent = content.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+      const phoneClean = (ord.phone || '').trim();
+
+      if (cleanContent.includes(cleanId)) {
+        targetOrder = ord;
+        matchedOrderId = ord.id;
+        break;
+      }
+
+      // Check match by phone in content
+      if (phoneClean.length >= 9 && cleanContent.includes(phoneClean)) {
+        targetOrder = ord;
+        matchedOrderId = ord.id;
+        break;
+      }
+    }
+
+    // Record Webhook Log in PostgreSQL
+    const webhookLogRes = await query(`
+      INSERT INTO payment_webhooks 
+        (transaction_id, order_id, gateway, amount_in, transaction_content, account_number, status, raw_payload)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      RETURNING *;
+    `, [
+      transactionId.toString(),
+      matchedOrderId,
+      gateway,
+      amountIn,
+      content,
+      accountNumber,
+      targetOrder ? 'SUCCESS_MATCHED' : 'UNMATCHED_ORDER',
+      JSON.stringify(payload)
+    ]);
+
+    // If order is found, automatically update payment status and booking status
+    if (targetOrder) {
+      const requiredDeposit = Number(targetOrder.deposit_amount || 0);
+      const totalAmount = Number(targetOrder.total_amount || 0);
+
+      let newPaymentStatus = 'DEPOSITED';
+      if (amountIn >= totalAmount && totalAmount > 0) {
+        newPaymentStatus = 'FULLY_PAID';
+      } else if (amountIn >= requiredDeposit) {
+        newPaymentStatus = 'DEPOSITED';
+      } else {
+        newPaymentStatus = 'PARTIALLY_PAID';
+      }
+
+      const updatedOrderRes = await query(`
+        UPDATE orders SET
+          payment_status = $1,
+          booking_status = 'CONFIRMED',
+          notes = CONCAT(COALESCE(notes, ''), ' [Tự động xác nhận qua Ngân hàng Callback Txn #', $2, ' lúc ', NOW() AT TIME ZONE 'Asia/Ho_Chi_Minh', ']')
+        WHERE id = $3
+        RETURNING *;
+      `, [newPaymentStatus, transactionId, targetOrder.id]);
+
+      // Gửi email xác nhận tự động nếu có email
+      if (targetOrder.email) {
+        try {
+          const row = updatedOrderRes.rows[0];
+          sendOrderConfirmationEmail({
+            id: row.id,
+            customerName: row.customer_name,
+            phone: row.phone,
+            email: row.email,
+            serviceType: row.service_type,
+            itemDetails: row.item_details,
+            bookingDate: row.booking_date,
+            timeSlot: row.time_slot,
+            totalAmount: row.total_amount,
+            depositAmount: row.deposit_amount,
+            paymentStatus: row.payment_status
+          }).catch(e => console.warn('Lỗi gửi mail tự động webhook:', e));
+        } catch (e) {
+          console.warn('Lỗi gửi mail:', e);
+        }
+      }
+
+      console.log(`✅ [AUTO CONFIRMED ORDER]: ${targetOrder.id} - ${amountIn} VNĐ`);
+      return res.json({
+        success: true,
+        message: 'Ghi nhận giao dịch và tự động xác nhận đơn hàng thành công',
+        orderId: targetOrder.id,
+        paymentStatus: newPaymentStatus,
+        transactionId
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Ghi nhận giao dịch ngân hàng thành công (chưa khớp mã đơn cụ thể)',
+      transactionId
+    });
+  } catch (err) {
+    console.error('Lỗi xử lý webhook ngân hàng:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// 4. GET Poll Order Payment Status (Dành cho màn hình khách hàng tự động chuyển trang)
+app.get('/api/payment/check-status/:orderId', async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const result = await query('SELECT id, customer_name, service_type, total_amount, deposit_amount, payment_status, booking_status FROM orders WHERE id = $1', [orderId]);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ success: false, message: 'Không tìm thấy đơn hàng' });
+    }
+    const order = result.rows[0];
+    const isPaid = order.payment_status === 'DEPOSITED' || order.payment_status === 'FULLY_PAID' || order.payment_status === 'DEPOSITED_30%';
+    
+    res.json({
+      success: true,
+      orderId: order.id,
+      isPaid,
+      paymentStatus: order.payment_status,
+      bookingStatus: order.booking_status
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// 5. POST Webhook Simulator (Bộ giả lập Ngân Hàng bắn Callback trong Admin)
+app.post('/api/payment/simulate-webhook', async (req, res) => {
+  try {
+    const { orderId, amount, customContent } = req.body;
+    if (!orderId) {
+      return res.status(400).json({ success: false, message: 'Vui lòng cung cấp mã đơn hàng cần giả lập' });
+    }
+
+    const orderRes = await query('SELECT * FROM orders WHERE id = $1', [orderId]);
+    if (orderRes.rows.length === 0) {
+      return res.status(404).json({ success: false, message: 'Mã đơn không tồn tại trong hệ thống' });
+    }
+
+    const order = orderRes.rows[0];
+    const transferAmount = amount ? Number(amount) : Number(order.deposit_amount || order.total_amount || 500000);
+    const content = customContent || `AURA ${order.id} ${order.phone || ''}`;
+    const transactionId = `SIM-${Date.now()}`;
+
+    // Simulate SePay / Ngân hàng payload
+    const mockPayload = {
+      id: transactionId,
+      gateway: 'MBBank-Simulator',
+      transactionDate: new Date().toISOString(),
+      accountNumber: '0975397923',
+      subAccount: null,
+      transferType: 'in',
+      transferAmount: transferAmount,
+      accumulated: transferAmount,
+      code: null,
+      transaction_content: content,
+      referenceCode: transactionId,
+      description: content
+    };
+
+    // Update order
+    const newPaymentStatus = transferAmount >= Number(order.total_amount) ? 'FULLY_PAID' : 'DEPOSITED';
+    await query(`
+      UPDATE orders SET
+        payment_status = $1,
+        booking_status = 'CONFIRMED',
+        notes = CONCAT(COALESCE(notes, ''), ' [Giả lập Webhook Ngân Hàng #', $2, ']')
+      WHERE id = $3;
+    `, [newPaymentStatus, transactionId, order.id]);
+
+    // Insert Webhook Log
+    await query(`
+      INSERT INTO payment_webhooks 
+        (transaction_id, order_id, gateway, amount_in, transaction_content, account_number, status, raw_payload)
+      VALUES ($1, $2, 'MBBank-Simulator', $3, $4, '0975397923', 'SUCCESS_MATCHED', $5);
+    `, [transactionId, order.id, transferAmount, content, JSON.stringify(mockPayload)]);
+
+    res.json({
+      success: true,
+      message: `Đã giả lập thành công Webhook Ngân Hàng bắn về đơn hàng ${order.id}!`,
+      data: {
+        orderId: order.id,
+        transferAmount,
+        content,
+        transactionId,
+        paymentStatus: newPaymentStatus
+      }
+    });
+  } catch (err) {
+    console.error('Lỗi giả lập webhook:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// 6. GET Webhook History Logs (Xem nhật ký Callback trong Admin)
+app.get('/api/payment/webhook-logs', async (req, res) => {
+  try {
+    const result = await query('SELECT * FROM payment_webhooks ORDER BY created_at DESC LIMIT 50');
+    res.json({
+      success: true,
+      data: result.rows.map(r => ({
+        id: r.id,
+        transactionId: r.transaction_id,
+        orderId: r.order_id,
+        gateway: r.gateway,
+        amountIn: Number(r.amount_in),
+        transactionContent: r.transaction_content,
+        accountNumber: r.account_number,
+        status: r.status,
+        createdAt: r.created_at
+      }))
+    });
+  } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
 });

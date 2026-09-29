@@ -44,6 +44,26 @@ export default function PhotoboothSection({ onCompleteBooking, initialSelectedCo
   const [isLoadingSlots, setIsLoadingSlots] = useState(false);
   const [conflictWarning, setConflictWarning] = useState('');
 
+  // Dynamic Bank Config
+  const [bankConfig, setBankConfig] = useState({
+    bankBin: '970422',
+    bankName: 'MB Bank (Quân Đội)',
+    accountNumber: '0975397923',
+    accountHolder: 'AURA STUDIO',
+    qrTemplate: 'compact2'
+  });
+
+  useEffect(() => {
+    fetch('/api/payment/bank-config')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.data) {
+          setBankConfig(data.data);
+        }
+      })
+      .catch(err => console.warn('Lỗi tải bank config trong Photobooth:', err));
+  }, []);
+
   const bookingFormRef = useRef(null);
 
   // Fetch photobooth concepts from database API
@@ -552,20 +572,24 @@ export default function PhotoboothSection({ onCompleteBooking, initialSelectedCo
                   </span>
                 </div>
 
-                {/* Dynamic VietQR Block */}
+                {/* Dynamic VietQR or Custom Uploaded QR Block */}
                 <div className="bg-white p-4 rounded-2xl border border-amber-200 text-center space-y-2 shadow-inner">
                   <span className="text-[11px] font-bold text-slate-700 block">
-                    Quét QR VietQR Chuyển Cọc Giữ Lịch:
+                    Quét QR Chuyển Cọc Giữ Lịch:
                   </span>
-                  <div className="w-36 h-36 mx-auto bg-slate-100 p-2 rounded-xl border border-slate-200 flex items-center justify-center">
+                  <div className="w-36 h-36 mx-auto bg-slate-100 p-2 rounded-xl border border-slate-200 flex items-center justify-center overflow-hidden">
                     <img
-                      src={`https://api.vietqr.io/image/970422-0975397923-qM3y46g.jpg?accountName=AURA%20STUDIO&amount=${depositAmount}&addInfo=${encodeURIComponent(`AURA PHOTOBOOTH ${customerPhone || '0975397923'}`)}`}
-                      alt="VietQR MB Bank"
+                      src={
+                        bankConfig.qrType === 'custom_image' && bankConfig.customQrImage
+                          ? bankConfig.customQrImage
+                          : `https://api.vietqr.io/image/${bankConfig.bankBin || '970422'}-${bankConfig.accountNumber || '0975397923'}-${bankConfig.qrTemplate || 'compact2'}.jpg?accountName=${encodeURIComponent(bankConfig.accountHolder || 'AURA STUDIO')}&amount=${depositAmount}&addInfo=${encodeURIComponent(`AURA PHOTOBOOTH ${customerPhone || '0975397923'}`)}`
+                      }
+                      alt="Mã QR Thanh Toán"
                       className="w-full h-full object-contain"
                     />
                   </div>
                   <p className="text-[10px] text-slate-500">
-                    Ngân hàng Quân Đội (MB Bank) - STK: <strong>0975397923</strong> (Aura Studio)
+                    {bankConfig.bankName} - STK: <strong>{bankConfig.accountNumber}</strong> ({bankConfig.accountHolder})
                   </p>
                 </div>
               </div>

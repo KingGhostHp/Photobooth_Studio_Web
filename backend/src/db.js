@@ -197,6 +197,48 @@ const initDb = async () => {
       );
     `);
 
+    // 10. Create bank_configs table (Cấu hình STK ngân hàng nhận tiền)
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS bank_configs (
+        id VARCHAR(50) PRIMARY KEY DEFAULT 'primary_bank',
+        bank_code VARCHAR(50) NOT NULL DEFAULT 'MB',
+        bank_bin VARCHAR(20) NOT NULL DEFAULT '970422',
+        bank_name VARCHAR(100) NOT NULL DEFAULT 'MB Bank (Quân Đội)',
+        account_number VARCHAR(50) NOT NULL DEFAULT '0975397923',
+        account_holder VARCHAR(255) NOT NULL DEFAULT 'AURA STUDIO',
+        qr_template VARCHAR(50) DEFAULT 'compact2',
+        qr_type VARCHAR(50) DEFAULT 'dynamic',
+        custom_qr_image TEXT,
+        webhook_api_key VARCHAR(100) DEFAULT 'AURA_SECURE_WEBHOOK_2026',
+        is_auto_confirm_enabled BOOLEAN DEFAULT true,
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      );
+
+      ALTER TABLE bank_configs ADD COLUMN IF NOT EXISTS qr_type VARCHAR(50) DEFAULT 'dynamic';
+      ALTER TABLE bank_configs ADD COLUMN IF NOT EXISTS custom_qr_image TEXT;
+
+      INSERT INTO bank_configs (id, bank_code, bank_bin, bank_name, account_number, account_holder, qr_template, qr_type, custom_qr_image, webhook_api_key, is_auto_confirm_enabled)
+      VALUES ('primary_bank', 'MB', '970422', 'MB Bank (Ngân Hàng Quân Đội)', '0975397923', 'AURA STUDIO', 'compact2', 'dynamic', null, 'AURA_SECURE_WEBHOOK_2026', true)
+      ON CONFLICT (id) DO NOTHING;
+    `);
+
+    // 11. Create payment_webhooks table (Lịch sử giao dịch Callback & Biến động số dư)
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS payment_webhooks (
+        id SERIAL PRIMARY KEY,
+        transaction_id VARCHAR(100),
+        order_id VARCHAR(100),
+        gateway VARCHAR(50) DEFAULT 'SEPAY/VIETQR',
+        amount_in BIGINT NOT NULL,
+        transaction_content TEXT,
+        account_number VARCHAR(50),
+        status VARCHAR(50) DEFAULT 'SUCCESS',
+        raw_payload JSONB DEFAULT '{}'::jsonb,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      );
+      CREATE INDEX IF NOT EXISTS idx_payment_webhooks_order ON payment_webhooks (order_id);
+    `);
+
     // Seed Categories if Table is Empty
     const catCountRes = await pool.query('SELECT COUNT(*) FROM costume_categories');
     if (parseInt(catCountRes.rows[0].count, 10) === 0) {
