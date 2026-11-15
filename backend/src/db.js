@@ -2,12 +2,12 @@ const { Pool } = require('pg');
 
 // Create Postgres Connection Pool
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgresql://aura_admin:aura_password_2026@localhost:5432/aura_studio_db',
+  connectionString: process.env.DATABASE_URL,
 });
 
 // Enforce UTF8 encoding on all PostgreSQL connections
 pool.on('connect', (client) => {
-  client.query("SET client_encoding TO 'UTF8'");
+  // PostgreSQL cluster and client encoding are UTF8; avoid overlapping queries here.
 });
 
 // Helper for running queries
@@ -63,6 +63,12 @@ const initDb = async () => {
         tags JSONB,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
+    `);
+
+    await pool.query(`
+      ALTER TABLE costumes ADD COLUMN IF NOT EXISTS images JSONB NOT NULL DEFAULT '[]';
+      UPDATE costumes SET images=jsonb_build_array(image)
+      WHERE images='[]'::jsonb AND NULLIF(image,'') IS NOT NULL;
     `);
 
     // 3. Create orders table
@@ -293,7 +299,7 @@ const initDb = async () => {
     }
 
     // Clean up any legacy mock orders or test orders with corrupted characters
-    await pool.query("DELETE FROM orders WHERE id LIKE 'AUR-20260808-%' OR customer_name LIKE '%?%' OR id = 'AUR-20260902-785'");
+    // Existing orders are preserved during initialization.
 
     // Seed Initial Hero Banners if Empty
     const bannerCountRes = await pool.query('SELECT COUNT(*) FROM hero_banners');
@@ -455,65 +461,12 @@ const initDb = async () => {
       }
     }
 
-    // Seed initial Visitor Logs & Monthly Analytics if empty
-    const visitorCountRes = await pool.query('SELECT COUNT(*) FROM visitor_logs');
-    if (parseInt(visitorCountRes.rows[0].count, 10) === 0) {
-      console.log('🌱 Seeding initial visitor traffic logs and monthly analytics into PostgreSQL...');
-      const monthsData = [
-        { month: '2026-05', visitors: 1420, rev: 14850000, dep: 4500000, rentals: 14, slots: 28, totalOrders: 42 },
-        { month: '2026-06', visitors: 2150, rev: 22400000, dep: 7200000, rentals: 22, slots: 45, totalOrders: 67 },
-        { month: '2026-07', visitors: 3340, rev: 35600000, dep: 11500000, rentals: 38, slots: 68, totalOrders: 106 },
-        { month: '2026-08', visitors: 4890, rev: 52300000, dep: 17800000, rentals: 56, slots: 95, totalOrders: 151 },
-        { month: '2026-09', visitors: 5820, rev: 61850000, dep: 21400000, rentals: 64, slots: 112, totalOrders: 176 }
-      ];
-
-      for (const m of monthsData) {
-        // Insert aggregated monthly summary
-        const aiData = {
-          month: m.month,
-          metrics: {
-            retentionRate: '68.5%',
-            avgSessionDuration: '3m 42s',
-            conversionRate: '3.1%',
-            popularCategory: 'Cổ Phục Việt & Áo Dài Kỷ Yếu',
-            photoboothPopularity: 'Retro Y2K Cyberpunk Pink Strip',
-            peakHours: '14:00 - 18:00',
-            trafficSources: { direct: 42, social: 38, organicSearch: 20 }
-          }
-        };
-
-        await pool.query(`
-          INSERT INTO analytics_monthly_summaries 
-            (month, total_visitors, total_revenue, total_deposits, rental_orders_count, photo_slots_count, total_orders_count, ai_structured_data)
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-          ON CONFLICT (month) DO UPDATE SET
-            total_visitors = EXCLUDED.total_visitors,
-            total_revenue = EXCLUDED.total_revenue,
-            total_deposits = EXCLUDED.total_deposits,
-            rental_orders_count = EXCLUDED.rental_orders_count,
-            photo_slots_count = EXCLUDED.photo_slots_count,
-            total_orders_count = EXCLUDED.total_orders_count,
-            ai_structured_data = EXCLUDED.ai_structured_data;
-        `, [m.month, m.visitors, m.rev, m.dep, m.rentals, m.slots, m.totalOrders, JSON.stringify(aiData)]);
-
-        // Insert sample visitor log batch for the month
-        await pool.query(`
-          INSERT INTO visitor_logs (visitor_id, page_url, user_agent, ip_address, duration_seconds, visited_date, visited_month)
-          VALUES 
-            ($1, '/', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)', '127.0.0.1', 45, $2, $3),
-            ($4, '/#costumes', 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0)', '127.0.0.1', 85, $2, $3),
-            ($5, '/#photobooth', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)', '127.0.0.1', 120, $2, $3);
-        `, [
-          `VISIT-${m.month}-01`, `${m.month}-05`, m.month,
-          `VISIT-${m.month}-02`, `${m.month}-12`,
-          `VISIT-${m.month}-03`
-        ]);
-      }
-    }
+    // Analytics comes from real visitor events and verified transactions.
 
     console.log('✅ PostgreSQL Schema & Seed initialized successfully!');
   } catch (err) {
-    console.error('❌ Error during PostgreSQL initialization:', err);
+    console.error('Database initialization failed:', err.message);
+    throw err;
   }
 };
 

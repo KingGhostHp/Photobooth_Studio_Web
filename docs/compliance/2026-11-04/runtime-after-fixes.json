@@ -1,0 +1,10 @@
+[
+  {
+    "path": "/api/analytics/track-visit",
+    "status": 410
+  },
+  {
+    "path": "/api/admin/orders",
+    "status": 401
+  }
+]

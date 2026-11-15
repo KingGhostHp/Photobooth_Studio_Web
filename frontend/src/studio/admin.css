@@ -1,0 +1,818 @@
+/* Admin density and navigation. Keep the customer storefront independent. */
+.admin-shell {
+  --sidebar-width: 220px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.admin-shell .admin-sidebar {
+  width: var(--sidebar-width);
+  height: 100dvh;
+  padding: 12px 10px;
+  overflow: hidden;
+}
+.admin-sidebar-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  height: 56px;
+  margin-bottom: 12px;
+  padding: 0 8px;
+}
+.admin-shell .admin-sidebar .wordmark {
+  margin: 0;
+  font-size: 30px;
+}
+.admin-shell .wordmark > .sidebar-brand-full {
+  margin: 0;
+  color: var(--ink);
+  font-size: inherit;
+  vertical-align: baseline;
+}
+.sidebar-brand-full > span {
+  color: var(--accent);
+  font-size: 18px;
+  vertical-align: top;
+}
+.admin-shell .admin-sidebar .wordmark small {
+  font-size: 7px;
+  letter-spacing: 0.14em;
+  margin-top: 6px;
+}
+.admin-shell .sidebar-brand-mini {
+  display: none;
+}
+.admin-shell .admin-sidebar nav {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #bdc5af transparent;
+  padding: 3px 2px;
+}
+.admin-shell .admin-sidebar nav button {
+  flex-shrink: 0;
+  width: 100%;
+  min-height: 36px;
+  padding: 8px 10px;
+  gap: 10px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #626d54;
+}
+.admin-shell .admin-sidebar nav button:hover,
+.admin-shell .admin-sidebar-bottom :is(a, button):hover {
+  background: #edf0e5;
+  color: #37452b;
+}
+.admin-shell .admin-nav-label {
+  font-size: inherit;
+  background: none;
+  color: inherit;
+  margin: 0;
+  min-width: 0;
+  text-align: left;
+}
+.admin-shell .admin-sidebar nav .admin-nav-count {
+  margin-left: auto;
+  font-size: 10px;
+  line-height: 18px;
+}
+.admin-shell .admin-sidebar-bottom {
+  flex-shrink: 0;
+  margin-top: 10px;
+  border-top: 1px solid var(--line);
+  padding: 8px 2px 0;
+  gap: 2px;
+}
+.admin-shell .admin-sidebar-bottom :is(a, button) {
+  min-height: 32px;
+  padding: 6px 10px;
+  font-size: 12px;
+  gap: 10px;
+  border-radius: 5px;
+}
+.admin-shell .admin-main {
+  width: calc(100% - var(--sidebar-width));
+  margin-left: var(--sidebar-width);
+}
+.admin-shell .admin-topbar {
+  height: 48px;
+  min-height: 48px;
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  padding-inline: 18px;
+  justify-content: flex-start;
+  font-size: 12px;
+  gap: 12px;
+}
+.admin-shell .admin-breadcrumb {
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+.admin-shell .admin-topbar > div:last-child {
+  gap: 12px;
+  font-size: 11px;
+}
+.admin-shell .admin-avatar {
+  width: 26px;
+  height: 26px;
+}
+.admin-shell .admin-content {
+  padding: 18px 20px;
+}
+.admin-shell .admin-page-heading {
+  margin-bottom: 16px;
+  gap: 16px;
+}
+.admin-shell .admin-page-heading h1 {
+  font-size: 22px;
+  line-height: 1.4;
+}
+.admin-shell .button {
+  min-height: 32px;
+  padding: 6px 12px;
+  font-size: 12px;
+  gap: 8px;
+  border-radius: 5px;
+}
+.admin-shell .button:hover {
+  transform: none;
+}
+.admin-shell .icon-button {
+  width: 32px;
+  height: 32px;
+  padding: 7px;
+}
+.admin-shell .admin-desktop-toggle {
+  display: inline-flex;
+}
+.admin-shell .admin-mobile-close {
+  display: none;
+}
+.admin-shell :is(input, select, textarea) {
+  font-size: 13px;
+  min-height: 34px;
+  padding: 7px 10px;
+}
+.admin-shell input[type="checkbox"] {
+  min-height: auto;
+  padding: 0;
+}
+.admin-shell input[type="file"] {
+  min-height: 34px;
+}
+.admin-shell .field {
+  margin-top: 12px;
+  gap: 5px;
+  font-size: 12px;
+}
+.admin-shell .field small,
+.admin-shell .muted {
+  font-size: 11px;
+}
+.admin-shell .stat-grid {
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.admin-shell .stat-card {
+  padding: 12px 14px;
+}
+.admin-shell .stat-card > div {
+  font-size: 11px;
+  gap: 8px;
+}
+.admin-shell .stat-card > div > span:last-child {
+  display: none;
+}
+.admin-shell .stat-card > strong {
+  font-size: 25px;
+  margin: 7px 0 3px;
+}
+.admin-shell .stat-card small {
+  font-size: 10px;
+  line-height: 1.5;
+}
+.admin-shell .dashboard-grid {
+  grid-template-columns: minmax(0, 1fr) 210px;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+.admin-shell .admin-panel {
+  padding: 16px;
+}
+.admin-shell .panel-heading {
+  margin-bottom: 12px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.admin-shell .panel-heading h2 {
+  font-size: 14px;
+}
+.admin-shell .panel-heading p {
+  font-size: 11px;
+  margin-top: 4px;
+}
+.admin-shell .panel-heading .button {
+  font-size: 11px;
+  min-height: 30px;
+  padding: 5px 10px;
+}
+.admin-shell .revenue-chart {
+  height: 140px;
+  padding-top: 4px;
+}
+.admin-shell .bar-track {
+  height: 92px;
+}
+.admin-shell .revenue-chart > div > span {
+  font-size: 10px;
+  margin-bottom: 6px;
+}
+.admin-shell .revenue-chart small {
+  font-size: 10px;
+  margin-top: 6px;
+}
+.admin-shell .chart-note {
+  font-size: 11px;
+  margin-top: 8px;
+}
+.admin-shell .today-panel {
+  display: flex;
+}
+.admin-shell .today-panel h2 {
+  font-size: 15px;
+}
+.admin-shell .today-count {
+  font-size: 42px;
+  margin: 14px 0;
+}
+.admin-shell .today-count span {
+  font-size: 11px;
+  margin-top: 4px;
+}
+.admin-shell .today-panel > .button {
+  width: auto;
+  margin-top: auto;
+  min-height: 32px;
+  font-size: 11px;
+}
+.admin-shell .empty-state {
+  padding: 24px 16px;
+}
+.admin-shell .empty-mark {
+  display: none;
+}
+.admin-shell .empty-state h3 {
+  font-size: 16px;
+}
+.admin-shell .empty-state p {
+  margin-top: 6px;
+  font-size: 12px;
+}
+.admin-shell .admin-empty {
+  margin: 0;
+  padding: 18px 8px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.admin-shell .studio-table {
+  font-size: 12px;
+}
+.admin-shell .table-scroll {
+  position: relative;
+}
+.admin-shell .studio-table th {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 9px 10px;
+  color: #626d54;
+}
+.admin-shell .studio-table td {
+  padding: 9px 10px;
+}
+.admin-shell .studio-table td strong {
+  font-size: 12px;
+}
+.admin-shell .studio-table td small {
+  font-size: 10px;
+  margin-top: 3px;
+}
+.admin-shell .studio-table .studio-badge {
+  font-size: 10px;
+}
+.admin-shell .order-toolbar {
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.admin-shell .order-toolbar select {
+  min-height: 34px;
+  font-size: 12px;
+}
+.admin-shell .order-toolbar > span {
+  font-size: 11px;
+}
+.admin-shell .search-input input {
+  min-height: 34px;
+}
+.admin-shell .payment-settings {
+  max-width: 1000px;
+}
+.admin-shell .payment-settings .eyebrow {
+  display: none;
+}
+.admin-shell .payment-settings h2 {
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+.admin-shell .payment-settings .form-grid {
+  margin-top: 14px;
+  row-gap: 10px;
+}
+.admin-shell .payment-settings .field {
+  margin-top: 0;
+}
+.admin-shell .payment-settings .button {
+  margin-top: 12px;
+}
+.admin-shell .calendar-toolbar {
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.admin-shell .calendar-toolbar p {
+  font-size: 12px;
+}
+.admin-shell .calendar-toolbar small {
+  font-size: 11px;
+  margin-top: 2px;
+}
+.admin-shell .calendar-heading {
+  padding: 10px 14px;
+  font-size: 11px;
+}
+.admin-shell .calendar-time {
+  padding: 16px 12px;
+}
+.admin-shell .calendar-cell {
+  min-height: 62px;
+  padding: 8px;
+}
+.admin-shell .calendar-free {
+  margin: 7px;
+  font-size: 11px;
+}
+.admin-shell .calendar-booking {
+  padding: 9px;
+  gap: 4px;
+}
+
+/* Dense CMS controls; large media previews are kept in editors only. */
+.admin-shell .legacy-admin :is(.p-5, .p-6, .p-8) {
+  padding: 14px;
+}
+.admin-shell .legacy-admin :is(.gap-6, .gap-8) {
+  gap: 14px;
+}
+.admin-shell .legacy-admin :is(.space-y-6, .space-y-8) > :not(:last-child) {
+  margin-block-end: 14px;
+}
+.admin-shell .legacy-admin :is(.space-y-4, .space-y-5) > :not(:last-child) {
+  margin-block-end: 10px;
+}
+.admin-shell .legacy-admin :is(.pt-4, .pt-6) {
+  padding-top: 10px;
+}
+.admin-shell .legacy-admin .text-2xl {
+  font-size: 18px;
+}
+.admin-shell .legacy-admin .text-xl {
+  font-size: 16px;
+}
+.admin-shell .legacy-admin .text-lg {
+  font-size: 15px;
+}
+.admin-shell .legacy-admin .font-black,
+.admin-shell .legacy-admin .font-extrabold {
+  font-weight: 600;
+}
+.admin-shell .legacy-admin :is(button, .btn-gold, .btn-outline-gold) {
+  min-height: 32px;
+  font-size: 12px;
+  line-height: 1.4;
+  padding-block: 6px;
+}
+.admin-shell .legacy-admin :is(.btn-gold, .btn-outline-gold) {
+  padding-inline: 12px;
+  gap: 6px;
+}
+.admin-shell .legacy-admin .btn-gold {
+  display: inline-flex;
+}
+.admin-shell .admin-module-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 12px;
+}
+.admin-shell .inventory-tabs {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.admin-shell .inventory-tabs button {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  padding: 6px 10px;
+  background: transparent;
+  color: var(--muted);
+}
+.admin-shell .inventory-tabs button.active {
+  color: #37452b;
+  background: #e9eddf;
+  border-color: #d7decb;
+}
+.admin-shell .inventory-tabs button span {
+  font-size: 11px;
+}
+.admin-shell .inventory-list {
+  background: #fcfdf9;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.admin-shell .inventory-search {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 12px;
+}
+.admin-shell .inventory-search .search-input {
+  width: min(400px, 65%);
+}
+.admin-shell .inventory-search > span {
+  color: var(--muted);
+  font-size: 11px;
+  white-space: nowrap;
+}
+.admin-shell .inventory-table td:first-child {
+  min-width: 230px;
+}
+.admin-shell .inventory-table td {
+  padding: 5px 10px;
+  line-height: 1.35;
+}
+.admin-shell .inventory-table td small {
+  margin-top: 2px;
+  line-height: 1.25;
+}
+.admin-shell .inventory-table select {
+  min-height: 30px;
+  font-size: 11px;
+  max-width: 120px;
+  padding: 4px 7px;
+}
+.admin-shell .inventory-product {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.admin-shell .inventory-product img {
+  width: 34px;
+  height: 32px;
+  object-fit: cover;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+.admin-shell .inventory-product strong {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 280px;
+  line-height: 1.35;
+}
+.admin-shell .inventory-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 3px;
+}
+.admin-shell .inventory-actions .icon-button {
+  width: 30px;
+  height: 30px;
+  padding: 6px;
+}
+.admin-shell .inventory-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 12px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.admin-shell .inventory-pagination > div {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.admin-shell .admin-concepts-grid {
+  display: block;
+}
+.admin-shell .admin-concepts-grid > div {
+  margin-bottom: 12px;
+}
+.admin-shell .admin-concepts-grid .divide-y img {
+  width: 48px;
+  height: 56px;
+}
+.admin-shell .admin-concepts-grid .divide-y .p-5 {
+  padding: 12px 14px;
+}
+.admin-shell .admin-concept-preview {
+  border: 1px solid var(--line);
+  padding: 10px 14px;
+  border-radius: 6px;
+}
+.admin-concept-preview summary {
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+}
+.admin-concept-preview[open] > div {
+  margin-top: 12px;
+  max-width: 420px;
+}
+.admin-shell .admin-pricing-module :not(.fixed) > .relative[class*="aspect-"] {
+  aspect-ratio: auto;
+  height: 110px;
+}
+.admin-shell .admin-banners-module .lg\:col-span-5 {
+  aspect-ratio: auto;
+  height: 144px;
+}
+.admin-shell .admin-banners-module .lg\:col-span-7 {
+  padding: 12px 16px;
+}
+
+@media (min-width: 641px) {
+  .admin-shell.sidebar-collapsed {
+    --sidebar-width: 64px;
+  }
+  .admin-shell.sidebar-collapsed .admin-sidebar {
+    padding-inline: 8px;
+  }
+  .admin-shell.sidebar-collapsed .admin-sidebar-heading {
+    padding: 0;
+    justify-content: center;
+  }
+  .admin-shell.sidebar-collapsed .sidebar-brand-full,
+  .admin-shell.sidebar-collapsed .admin-nav-label,
+  .admin-shell.sidebar-collapsed .admin-nav-count {
+    display: none;
+  }
+  .admin-shell.sidebar-collapsed .sidebar-brand-mini {
+    display: block;
+    margin: 0;
+    color: var(--ink);
+    font-size: 28px;
+  }
+  .admin-shell.sidebar-collapsed .admin-sidebar nav button,
+  .admin-shell.sidebar-collapsed .admin-sidebar-bottom :is(a, button) {
+    justify-content: center;
+    padding-inline: 8px;
+  }
+}
+@media (max-width: 1000px) and (min-width: 641px) {
+  .admin-shell {
+    --sidebar-width: 200px;
+  }
+  .admin-shell .admin-content {
+    padding: 16px;
+  }
+  .admin-shell .stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .admin-shell .dashboard-grid {
+    grid-template-columns: minmax(0, 1fr) 190px;
+  }
+}
+@media (max-width: 640px) {
+  .admin-shell .admin-sidebar {
+    width: min(280px, calc(100vw - 44px));
+    transform: translateX(-100%);
+    visibility: hidden;
+    pointer-events: none;
+    transition: none;
+  }
+  .admin-shell .admin-sidebar.open {
+    transform: translateX(0);
+    visibility: visible;
+    pointer-events: auto;
+  }
+  .admin-shell .admin-main {
+    width: 100%;
+    margin-left: 0;
+  }
+  .admin-shell .admin-desktop-toggle {
+    display: none;
+  }
+  .admin-shell .admin-mobile-close {
+    display: inline-flex;
+  }
+  .admin-shell .admin-topbar {
+    height: 50px;
+    min-height: 50px;
+    padding-inline: 10px;
+    gap: 8px;
+  }
+  .admin-shell .admin-topbar .mobile-menu {
+    display: inline-flex;
+  }
+  .admin-shell .admin-breadcrumb {
+    font-size: 12px;
+  }
+  .admin-shell .admin-today {
+    display: none;
+  }
+  .admin-shell .admin-content {
+    padding: 14px 12px;
+  }
+  .admin-shell .admin-page-heading h1 {
+    font-size: 20px;
+  }
+  .admin-shell .admin-page-heading {
+    margin-bottom: 12px;
+  }
+  .admin-shell .admin-page-heading > .button {
+    font-size: 11px;
+    width: auto;
+    height: auto;
+    padding: 6px 10px;
+  }
+  .admin-shell .admin-page-heading > .button svg {
+    width: 14px;
+  }
+  .admin-shell .admin-sidebar nav button {
+    min-height: 42px;
+  }
+  .admin-shell .stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .admin-shell .stat-card {
+    padding: 10px;
+  }
+  .admin-shell .stat-card > strong {
+    font-size: 24px;
+  }
+  .admin-shell .stat-card small {
+    font-size: 10px;
+  }
+  .admin-shell .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+  .admin-shell .today-panel {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 10px;
+  }
+  .admin-shell .today-count {
+    margin: 0;
+    font-size: 30px;
+    grid-column: 2;
+    grid-row: 1 / 3;
+  }
+  .admin-shell .today-panel > .button {
+    justify-self: start;
+  }
+  .admin-shell .admin-panel {
+    padding: 12px;
+  }
+  .admin-shell .order-toolbar {
+    flex-wrap: wrap;
+  }
+  .admin-shell .order-toolbar .search-input {
+    flex-basis: 100%;
+  }
+  .admin-shell .calendar-toolbar {
+    align-items: flex-start;
+  }
+  .admin-shell .calendar-grid {
+    grid-template-columns: 92px 1fr 1fr;
+  }
+  .admin-shell .calendar-heading {
+    font-size: 10px;
+    padding: 10px 7px;
+  }
+  .admin-shell .calendar-time {
+    font-size: 10px;
+    padding: 14px 5px;
+  }
+  .admin-shell .calendar-cell {
+    padding: 6px;
+  }
+  .admin-shell .inventory-pagination {
+    flex-wrap: wrap;
+  }
+  .admin-shell .inventory-search {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .admin-shell .inventory-search .search-input {
+    width: 100%;
+  }
+  .admin-shell .inventory-table {
+    min-width: 850px;
+  }
+  .admin-shell .legacy-admin :is(button, .btn-gold, .btn-outline-gold),
+  .admin-shell .button,
+  .admin-shell :is(input, select) {
+    min-height: 38px;
+  }
+  .admin-shell .admin-sidebar-bottom :is(a, button) {
+    min-height: 38px;
+  }
+  .admin-shell .admin-sidebar-heading {
+    margin-bottom: 8px;
+  }
+}
+.admin-shell .product-image-editor {
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 12px;
+  margin: 0;
+}
+.admin-shell .product-image-editor legend {
+  padding-inline: 5px;
+  font-size: 12px;
+  font-weight: 500;
+}
+.admin-shell .product-image-editor legend span {
+  color: var(--muted);
+  margin-left: 8px;
+  font-size: 10px;
+}
+.admin-shell .product-image-editor > p {
+  font-size: 10px;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+.admin-shell .product-image-url {
+  display: flex;
+  gap: 8px;
+  margin-block: 10px;
+}
+.admin-shell .product-image-url input { flex: 1; min-width: 0; }
+.admin-shell .product-image-url button { flex: none; }
+.admin-shell .product-image-editor-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 10px;
+}
+.admin-shell .product-image-tile {
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  overflow: hidden;
+}
+.admin-shell .product-image-tile > img {
+  width: 100%;
+  height: 104px;
+  object-fit: contain;
+  background: var(--paper);
+}
+.admin-shell .product-image-tile > span {
+  display: block;
+  font-size: 10px;
+  padding: 5px 7px;
+}
+.admin-shell .product-image-tile > div {
+  display: flex;
+  justify-content: space-between;
+  padding: 3px;
+}
+.admin-shell .product-image-tile button {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  min-height: 30px;
+  padding: 0;
+}
+.admin-shell .image-editor-error {
+  color: #993b29;
+  font-size: 11px;
+}

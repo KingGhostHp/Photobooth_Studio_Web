@@ -1,0 +1,26 @@
+Quét: .local/legal-audit/source-recheck
+
+[có]    FORM
+          frontend/src/studio/Admin.jsx:365:<form
+          frontend/src/studio/Admin.jsx:759:<form
+          frontend/src/studio/Admin.jsx:787:<form
+[không] TRACKING
+[có]    COMMERCE
+          backend/src/studio/index.js:262:/checkout
+          backend/src/studio/index.js:271:/checkout
+          backend/src/studio/index.js:385:/checkout
+[có]    AUTH
+          backend/src/studio/auth.js:29:đăng nhập
+          backend/src/studio/auth.js:75:/login
+          frontend/src/studio/Admin.jsx:337:/login
+[không] MARKETPLACE
+[không] AI
+[không] PERMISSIONS
+[không] SDK_TRACKING
+[không] ADS_SDK
+[không] FOREIGN_HOST
+[không] MOBILE_APP
+
+Gợi ý: mức 2, bán hàng/TMĐT. Áp dụng 01 + 02 + 04 (thêm 05/06 nếu có quảng cáo, hợp đồng điện tử)
+
+LEVEL=2 AI=no FOREIGN_HOST=no APP=no TRACKING_CONSENT=none

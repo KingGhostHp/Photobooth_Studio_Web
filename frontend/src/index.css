@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./studio/studio.css";
 
 @layer base {
   body {
@@ -9,7 +10,7 @@
   }
 
   h1, h2, h3, .font-serif-title {
-    font-family: 'Outfit', 'Playfair Display', Georgia, serif;
+    font-family: 'Playfair Display Variable', Georgia, serif;
     letter-spacing: -0.02em;
   }
 }

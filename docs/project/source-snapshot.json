@@ -1,0 +1,659 @@
+{
+  "recordedOn": "2026-11-04",
+  "timezone": "Asia/Saigon",
+  "scope": "Static inventory of JS/JSX/CSS files and API registrations; reading focused on backend routes/schema and frontend view composition/state/effects/handlers. Not a claim of exhaustive line-by-line review of all JSX or E2E validation.",
+  "modules": [
+    {
+      "file": "backend/src/db.js",
+      "lines": 528,
+      "sha256": "1de3de6a1965f663c284e06d217363bcdd6fa97aa22c1f3ad76fe1ebed770fd9",
+      "relativeImports": [],
+      "fetchCalls": []
+    },
+    {
+      "file": "backend/src/emailService.js",
+      "lines": 214,
+      "sha256": "5cb6e53387f656855422562808d972b44e812ebd344458bde74ce8b8cf148018",
+      "relativeImports": [],
+      "fetchCalls": []
+    },
+    {
+      "file": "backend/src/server.js",
+      "lines": 1885,
+      "sha256": "f56b0c8d993b74039c013ee34ac30bae0b9138748920223cfad2344a872e06bf",
+      "relativeImports": [],
+      "fetchCalls": []
+    },
+    {
+      "file": "frontend/src/App.css",
+      "lines": 185,
+      "sha256": "c2571ce7245629994b8adc84f6c48e1920f047a4e7e29c89a4aeb51eeb1b5433",
+      "relativeImports": [],
+      "fetchCalls": []
+    },
+    {
+      "file": "frontend/src/App.jsx",
+      "lines": 277,
+      "sha256": "b8b74dee18b6bdf364e51a5d460a732730fc1c465490afe240cee4683e01c920",
+      "relativeImports": [
+        "./components/common/Header",
+        "./components/common/Footer",
+        "./components/customer/HeroSection",
+        "./components/customer/HeroBannerCarousel",
+        "./components/customer/CostumesCatalog",
+        "./components/customer/OrderLookupSection",
+        "./components/customer/ComboPackagesSection",
+        "./components/customer/PhotoboothSection",
+        "./components/customer/LookbookSection",
+        "./components/customer/CartDrawer",
+        "./components/admin/AdminSidebar",
+        "./components/admin/AdminHeader",
+        "./components/admin/AdminDashboard",
+        "./components/admin/AdminInventory",
+        "./components/admin/AdminCalendar",
+        "./components/admin/AdminOrders",
+        "./components/admin/AdminPhotobooth",
+        "./components/admin/AdminPricing",
+        "./components/admin/AdminBanners",
+        "./components/admin/AdminPaymentSettings"
+      ],
+      "fetchCalls": [
+        "/api/orders",
+        "/api/analytics/track-visit",
+        "/api/orders/${updatedOrder.id}",
+        "/api/orders/${orderId}"
+      ]
+    },
+    {
+      "file": "frontend/src/components/admin/AdminBanners.jsx",
+      "lines": 513,
+      "sha256": "7b26e8bc49e2d7e4183263a7c97cd688a9786b48e7989d082e145fea1e9c696c",
+      "relativeImports": [],
+      "fetchCalls": [
+        "/api/banners?all=true",
+        "/api/banners/${editingBanner.id}",
+        "/api/banners",
+        "/api/banners/${banner.id}/toggle",
+        "/api/banners/${id}"
+      ]
+    },
+    {
+      "file": "frontend/src/components/admin/AdminCalendar.jsx",
+      "lines": 189,
+      "sha256": "3bc2e381f91be63015db8f130f4078426ed1c65035c5b6990e327d78008808d5",
+      "relativeImports": [
+        "../../data/bookings",
+        "../common/CustomSelect",
+        "../../utils/vietnamTime"
+      ],
+      "fetchCalls": []
+    },
+    {
+      "file": "frontend/src/components/admin/AdminDashboard.jsx",
+      "lines": 599,
+      "sha256": "f1af94ec3d1c57b386ab03be7504bea53025bce818ee153893dd3f283c7ba151",
+      "relativeImports": [],
+      "fetchCalls": [
+        "/api/analytics/summary",
+        "/api/analytics/export-excel",
+        "/api/analytics/save-snapshot"
+      ]
+    },
+    {
+      "file": "frontend/src/components/admin/AdminHeader.jsx",
+      "lines": 57,
+      "sha256": "014c676738b03ade27758784d84477038fd07924b4ee1b7709341ddbe602373c",
+      "relativeImports": [],
+      "fetchCalls": []
+    },
+    {
+      "file": "frontend/src/components/admin/AdminInventory.jsx",
+      "lines": 956,
+      "sha256": "e3f2ce8c8fa666281ed142f59faf8e9a1f15bd88b880756419474d6b22167400",
+      "relativeImports": [
+        "../../data/costumes",
+        "../common/CustomSelect"
+      ],
+      "fetchCalls": [
+        "/api/costumes",
+        "/api/categories",
+        "/api/costumes",
+        "/api/costumes/${editingCostume.id}",
+        "/api/costumes/${id}/status",
+        "/api/costumes/${deletingCostume.id}",
+        "/api/categories",
+        "/api/categories/${editingCategory.id}",
+        "/api/categories/${deletingCategory.id}"
+      ]
+    },
+    {
+      "file": "frontend/src/components/admin/AdminOrders.jsx",
+      "lines": 474,
+      "sha256": "69347636b8c503a373d5d5d68d3d8990976b28ba211e4cd8dfe7debdcb7aca8f",
+      "relativeImports": [],
+      "fetchCalls": [
+        "/api/orders/${order.id}/confirm-return"
+      ]
+    },
+    {
+      "file": "frontend/src/components/admin/AdminPaymentSettings.jsx",
+      "lines": 646,
+      "sha256": "84f094a956248190f128c95f9d9e64c43e0dfc9e4e2819f15228a07eb28f6168",
+      "relativeImports": [],
+      "fetchCalls": [
+        "/api/payment/bank-config",
+        "/api/payment/webhook-logs",
+        "/api/payment/bank-config",
+        "/api/payment/simulate-webhook"
+      ]
+    },
+    {
+      "file": "frontend/src/components/admin/AdminPhotobooth.jsx",
+      "lines": 754,
+      "sha256": "24347909ae7b0a000366a4dd1f06b031525b490033f49c0e61daec9b0f34f791",
+      "relativeImports": [],
+      "fetchCalls": [
+        "/api/photobooth",
+        "/api/photobooth/${editingItem.id}",
+        "/api/photobooth",
+        "/api/photobooth/${id}"
+      ]
+    },
+    {
+      "file": "frontend/src/components/admin/AdminPricing.jsx",
+      "lines": 800,
+      "sha256": "206a92ce70a3bbc482ece377626ea61af84a06baba370b7324d04f8810d8883b",
+      "relativeImports": [],
+      "fetchCalls": [
+        "/api/packages",
+        "/api/addons",
+        "/api/photobooth",
+        "/api/packages/${editingPkg.id}",
+        "/api/packages",
+        "/api/packages/${id}",
+        "/api/addons/${editingAddon.id}",
+        "/api/addons",
+        "/api/addons/${id}",
+        "/api/photobooth/${editingPb.id}",
+        "/api/photobooth",
+        "/api/photobooth/${id}"
+      ]
+    },
+    {
+      "file": "frontend/src/components/admin/AdminSidebar.jsx",
+      "lines": 127,
+      "sha256": "7d5f2e17d1e966c7984c07cc3211bdb05993c936d0fbc90bda329512d5bfd674",
+      "relativeImports": [],
+      "fetchCalls": []
+    },
+    {
+      "file": "frontend/src/components/common/CustomSelect.jsx",
+      "lines": 80,
+      "sha256": "c5488de10a16b82695e10b1695fb36032e1333a16eef32dc6e751ce83aaac8d4",
+      "relativeImports": [],
+      "fetchCalls": []
+    },
+    {
+      "file": "frontend/src/components/common/Footer.jsx",
+      "lines": 147,
+      "sha256": "30b50d8bf6aa3d2d94198af02ebfa5ec8848ebf8d5cfb43ad339d3f160849717",
+      "relativeImports": [],
+      "fetchCalls": []
+    },
+    {
+      "file": "frontend/src/components/common/Header.jsx",
+      "lines": 312,
+      "sha256": "44e4c3f3cca3b59f2b8090915c0368c9119812fa675c9fbac58148eabb87b5d7",
+      "relativeImports": [],
+      "fetchCalls": []
+    },
+    {
+      "file": "frontend/src/components/customer/BookingSlotSection.jsx",
+      "lines": 265,
+      "sha256": "5c7b218b5d13011e8fc193e439470e82faad9b311204f308904ba1546fe8d927",
+      "relativeImports": [
+        "../../data/bookings"
+      ],
+      "fetchCalls": [
+        "/api/orders"
+      ]
+    },
+    {
+      "file": "frontend/src/components/customer/CartDrawer.jsx",
+      "lines": 628,
+      "sha256": "944228b189dfefad5ac793f1f5b4d2f7f852e472ca25e63829e989b7d96f6e25",
+      "relativeImports": [
+        "../../utils/vietnamTime"
+      ],
+      "fetchCalls": [
+        "/api/payment/bank-config",
+        "/api/payment/check-status/${currentOrder.id}",
+        "/api/costumes/check-conflict",
+        "/api/orders",
+        "/api/orders/${currentOrder.id}"
+      ]
+    },
+    {
+      "file": "frontend/src/components/customer/ComboPackagesSection.jsx",
+      "lines": 312,
+      "sha256": "79fe5bfdadcaa788d8a0a9eedb29ff304a24539a843bfaad8ad405ec54258425",
+      "relativeImports": [
+        "../../data/packages"
+      ],
+      "fetchCalls": [
+        "/api/packages",
+        "/api/addons"
+      ]
+    },
+    {
+      "file": "frontend/src/components/customer/CostumesCatalog.jsx",
+      "lines": 402,
+      "sha256": "a1763492e9c1b48f2951f5af5c5d0e976fa4dc2084553e9335a4a7e41570b77f",
+      "relativeImports": [
+        "../../data/costumes"
+      ],
+      "fetchCalls": [
+        "/api/costumes",
+        "/api/categories"
+      ]
+    },
+    {
+      "file": "frontend/src/components/customer/HeroBannerCarousel.jsx",
+      "lines": 219,
+      "sha256": "b342f4b7fa45f1b919621c7bf9d9640c7d170677789019386f7d6dbdeaabeb4e",
+      "relativeImports": [],
+      "fetchCalls": [
+        "/api/banners"
+      ]
+    },
+    {
+      "file": "frontend/src/components/customer/HeroSection.jsx",
+      "lines": 113,
+      "sha256": "1f34e7f653981213c1a1d498abadc3a462cd20b3925435141e1219836e6aa042",
+      "relativeImports": [],
+      "fetchCalls": []
+    },
+    {
+      "file": "frontend/src/components/customer/LookbookSection.jsx",
+      "lines": 144,
+      "sha256": "dcd24d1b19a57f4bdab416403e606fd8554fb4c01719020e50ffa59476552a1d",
+      "relativeImports": [
+        "../../data/lookbook"
+      ],
+      "fetchCalls": []
+    },
+    {
+      "file": "frontend/src/components/customer/MixMatchBuilder.jsx",
+      "lines": 190,
+      "sha256": "53ed2f92beb7fe0439e9c63c167313a82e17833a462cfe704cdce1671d4804f5",
+      "relativeImports": [
+        "../../data/costumes"
+      ],
+      "fetchCalls": []
+    },
+    {
+      "file": "frontend/src/components/customer/OrderLookupSection.jsx",
+      "lines": 299,
+      "sha256": "6a2bc9d7cc49d8aefe35e9344397c66aeafac161b694c6ac11cbc9bd506fd6f2",
+      "relativeImports": [],
+      "fetchCalls": [
+        "/api/orders/lookup?query=${encodeURIComponent(searchQuery.trim())}"
+      ]
+    },
+    {
+      "file": "frontend/src/components/customer/PackagesSection.jsx",
+      "lines": 180,
+      "sha256": "8844c397e32cc6405e4ce15b2f68b70a3085f3e3bbdb9c42f16f50a1830db199",
+      "relativeImports": [
+        "../../data/packages"
+      ],
+      "fetchCalls": [
+        "/api/packages",
+        "/api/addons"
+      ]
+    },
+    {
+      "file": "frontend/src/components/customer/PhotoboothSection.jsx",
+      "lines": 664,
+      "sha256": "d7b914ce1c1e87e4a1d489466264bf183a01f6061b13a41ad09df2d279c02161",
+      "relativeImports": [
+        "../../data/photobooth",
+        "../../data/bookings",
+        "../../utils/vietnamTime"
+      ],
+      "fetchCalls": [
+        "/api/payment/bank-config",
+        "/api/photobooth",
+        "/api/orders/booked-slots?date=${date}",
+        "/api/orders"
+      ]
+    },
+    {
+      "file": "frontend/src/data/bookings.js",
+      "lines": 57,
+      "sha256": "8bb2f3bd5e47b30d97d8f82ec74da4d16792e89099ec26012fef3afbb831fe39",
+      "relativeImports": [],
+      "fetchCalls": []
+    },
+    {
+      "file": "frontend/src/data/costumes.js",
+      "lines": 313,
+      "sha256": "2a1a758dc96d008f2dc41a145a831ecd784c8144e71a6c985a97997d511efd29",
+      "relativeImports": [],
+      "fetchCalls": []
+    },
+    {
+      "file": "frontend/src/data/lookbook.js",
+      "lines": 45,
+      "sha256": "1693f05b06c49660b4e85ec36d1195a60e3510c024c14d0cb90b30cd9886dbe4",
+      "relativeImports": [],
+      "fetchCalls": []
+    },
+    {
+      "file": "frontend/src/data/packages.js",
+      "lines": 72,
+      "sha256": "d9d6c3dd89d6bffd891eaf3e6e4c708b3f59e45f4959ce8405a13695116267cd",
+      "relativeImports": [],
+      "fetchCalls": []
+    },
+    {
+      "file": "frontend/src/data/photobooth.js",
+      "lines": 29,
+      "sha256": "3f2e13c10533189802a06ce65431ecb502f7ce45748bf553a60c7a3b728c130a",
+      "relativeImports": [],
+      "fetchCalls": []
+    },
+    {
+      "file": "frontend/src/index.css",
+      "lines": 159,
+      "sha256": "60bb73d25e2ca102bbe918375065157d9effaa1161a75249b6b85d207cad1881",
+      "relativeImports": [],
+      "fetchCalls": []
+    },
+    {
+      "file": "frontend/src/main.jsx",
+      "lines": 47,
+      "sha256": "2ae75dbac62753028074230429124308fd2e7c62c43eba3c05101e82e0a8ec19",
+      "relativeImports": [
+        "./index.css",
+        "./App.jsx"
+      ],
+      "fetchCalls": []
+    },
+    {
+      "file": "frontend/src/utils/vietnamTime.js",
+      "lines": 68,
+      "sha256": "77701ede857864bae9b7277709dd44b7fa8cf00c11244aed5511899ef5cb17b9",
+      "relativeImports": [],
+      "fetchCalls": []
+    }
+  ],
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/api/health",
+      "line": 19
+    },
+    {
+      "method": "GET",
+      "path": "/api/categories",
+      "line": 37
+    },
+    {
+      "method": "GET",
+      "path": "/api/categories/:id",
+      "line": 55
+    },
+    {
+      "method": "POST",
+      "path": "/api/categories",
+      "line": 80
+    },
+    {
+      "method": "PUT",
+      "path": "/api/categories/:id",
+      "line": 105
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/categories/:id",
+      "line": 138
+    },
+    {
+      "method": "GET",
+      "path": "/api/costumes",
+      "line": 157
+    },
+    {
+      "method": "GET",
+      "path": "/api/costumes/:id",
+      "line": 183
+    },
+    {
+      "method": "POST",
+      "path": "/api/costumes",
+      "line": 216
+    },
+    {
+      "method": "PUT",
+      "path": "/api/costumes/:id",
+      "line": 239
+    },
+    {
+      "method": "PUT",
+      "path": "/api/costumes/:id/status",
+      "line": 278
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/costumes/:id",
+      "line": 290
+    },
+    {
+      "method": "GET",
+      "path": "/api/orders",
+      "line": 449
+    },
+    {
+      "method": "POST",
+      "path": "/api/costumes/check-conflict",
+      "line": 484
+    },
+    {
+      "method": "GET",
+      "path": "/api/orders/booked-slots",
+      "line": 495
+    },
+    {
+      "method": "GET",
+      "path": "/api/orders/lookup",
+      "line": 517
+    },
+    {
+      "method": "PUT",
+      "path": "/api/orders/:id/confirm-return",
+      "line": 567
+    },
+    {
+      "method": "POST",
+      "path": "/api/orders",
+      "line": 593
+    },
+    {
+      "method": "PUT",
+      "path": "/api/orders/:id",
+      "line": 757
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/orders/:id",
+      "line": 837
+    },
+    {
+      "method": "GET",
+      "path": "/api/admin/stats",
+      "line": 851
+    },
+    {
+      "method": "GET",
+      "path": "/api/banners",
+      "line": 879
+    },
+    {
+      "method": "POST",
+      "path": "/api/banners",
+      "line": 909
+    },
+    {
+      "method": "PUT",
+      "path": "/api/banners/:id",
+      "line": 939
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/banners/:id/toggle",
+      "line": 972
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/banners/:id",
+      "line": 986
+    },
+    {
+      "method": "GET",
+      "path": "/api/packages",
+      "line": 1005
+    },
+    {
+      "method": "POST",
+      "path": "/api/packages",
+      "line": 1029
+    },
+    {
+      "method": "PUT",
+      "path": "/api/packages/:id",
+      "line": 1053
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/packages/:id",
+      "line": 1088
+    },
+    {
+      "method": "GET",
+      "path": "/api/addons",
+      "line": 1107
+    },
+    {
+      "method": "POST",
+      "path": "/api/addons",
+      "line": 1122
+    },
+    {
+      "method": "PUT",
+      "path": "/api/addons/:id",
+      "line": 1134
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/addons/:id",
+      "line": 1152
+    },
+    {
+      "method": "GET",
+      "path": "/api/photobooth",
+      "line": 1171
+    },
+    {
+      "method": "POST",
+      "path": "/api/photobooth",
+      "line": 1195
+    },
+    {
+      "method": "PUT",
+      "path": "/api/photobooth/:id",
+      "line": 1220
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/photobooth/:id",
+      "line": 1248
+    },
+    {
+      "method": "POST",
+      "path": "/api/analytics/track-visit",
+      "line": 1268
+    },
+    {
+      "method": "GET",
+      "path": "/api/analytics/summary",
+      "line": 1312
+    },
+    {
+      "method": "POST",
+      "path": "/api/analytics/save-snapshot",
+      "line": 1414
+    },
+    {
+      "method": "GET",
+      "path": "/api/analytics/export-excel",
+      "line": 1483
+    },
+    {
+      "method": "GET",
+      "path": "/api/payment/bank-config",
+      "line": 1573
+    },
+    {
+      "method": "PUT",
+      "path": "/api/payment/bank-config",
+      "line": 1616
+    },
+    {
+      "method": "POST",
+      "path": "/api/payment/webhook",
+      "line": 1642
+    },
+    {
+      "method": "GET",
+      "path": "/api/payment/check-status/:orderId",
+      "line": 1768
+    },
+    {
+      "method": "POST",
+      "path": "/api/payment/simulate-webhook",
+      "line": 1791
+    },
+    {
+      "method": "GET",
+      "path": "/api/payment/webhook-logs",
+      "line": 1859
+    }
+  ],
+  "unreachableFromMainByStaticRelativeImports": [
+    "frontend/src/App.css",
+    "frontend/src/components/customer/BookingSlotSection.jsx",
+    "frontend/src/components/customer/MixMatchBuilder.jsx",
+    "frontend/src/components/customer/PackagesSection.jsx"
+  ],
+  "missingLocalImageReferences": [
+    {
+      "asset": "/images/studio_bg_luxury.png",
+      "files": [
+        "frontend/src/data/costumes.js"
+      ]
+    },
+    {
+      "asset": "/images/studio_bg_heritage.png",
+      "files": [
+        "frontend/src/data/costumes.js"
+      ]
+    },
+    {
+      "asset": "/images/costume_vest_nam_1786199793132.png",
+      "files": [
+        "frontend/src/data/lookbook.js"
+      ]
+    }
+  ]
+}

@@ -1,19 +1,35 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Camera, Plus, Edit2, Trash2, Check, RefreshCw, Upload, Image as ImageIcon, Eye, X, CheckCircle2, ShieldCheck, Layers, Sparkles, ListPlus, CheckCircle } from 'lucide-react';
+import { adminFetch } from "../../studio/api";
+import React, { useState, useEffect, useRef } from "react";
+import {
+  Camera,
+  Plus,
+  Edit2,
+  Trash2,
+  Check,
+  RefreshCw,
+  Upload,
+  Image as ImageIcon,
+  Eye,
+  X,
+  CheckCircle2,
+  ShieldCheck,
+  Layers,
+  Sparkles,
+  CheckCircle,
+} from "lucide-react";
 
 const DEFAULT_PERKS_SUGGESTIONS = [
-  'Miễn phí mượn 50+ phụ kiện & đạo cụ',
-  'File ảnh gốc + Video GIF hậu trường',
-  'In 4 dải ảnh Strip Glossy cao cấp',
-  'Quét mã QR lấy file ảnh siêu tốc',
-  'Hỗ trợ chỉnh sửa da đẹp mịn màng',
-  'Tặng khung mica trong suốt để bàn'
+  "Miễn phí mượn 50+ phụ kiện & đạo cụ",
+  "File ảnh gốc + Video GIF hậu trường",
+  "In 4 dải ảnh Strip Glossy cao cấp",
+  "Quét mã QR lấy file ảnh siêu tốc",
+  "Hỗ trợ chỉnh sửa da đẹp mịn màng",
+  "Tặng khung mica trong suốt để bàn",
 ];
 
-export default function AdminPhotobooth() {
+export default function AdminPhotobooth({ refreshKey = 0 }) {
   const [concepts, setConcepts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const [statusMessage, setStatusMessage] = useState(null);
   const [selectedPreview, setSelectedPreview] = useState(null);
 
@@ -24,25 +40,25 @@ export default function AdminPhotobooth() {
   // Modal State
   const [showModal, setShowModal] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
-  const [newPerkInput, setNewPerkInput] = useState('');
+  const [newPerkInput, setNewPerkInput] = useState("");
   const [formData, setFormData] = useState({
-    code: 'PB-FRAME-01',
-    name: '',
-    description: '',
+    code: "PB-FRAME-01",
+    name: "",
+    description: "",
     price: 70000,
-    image: '',
+    image: "",
     perks: [
-      'Miễn phí mượn 50+ phụ kiện',
-      'File ảnh gốc + Video GIF hậu trường',
-      'In 4 dải ảnh Strip Glossy cao cấp',
-      'Quét mã QR lấy file siêu tốc'
-    ]
+      "Miễn phí mượn 50+ phụ kiện",
+      "File ảnh gốc + Video GIF hậu trường",
+      "In 4 dải ảnh Strip Glossy cao cấp",
+      "Quét mã QR lấy file siêu tốc",
+    ],
   });
 
   const fetchPhotobooth = async () => {
     try {
       setLoading(true);
-      const res = await fetch('/api/photobooth');
+      const res = await adminFetch("/api/photobooth");
       const data = await res.json();
       if (data.success && Array.isArray(data.data)) {
         setConcepts(data.data);
@@ -51,19 +67,21 @@ export default function AdminPhotobooth() {
         }
       }
     } catch (err) {
-      console.error('Lỗi khi tải danh sách Photobooth:', err);
-      showNotification('Không thể kết nối đến máy chủ PostgreSQL', 'error');
+      console.error("Lỗi khi tải danh sách Photobooth:", err);
+      showNotification(
+        "Chưa tải được dữ liệu studio. Vui lòng thử lại.",
+        "error",
+      );
     } finally {
       setLoading(false);
-      setIsRefreshing(false);
     }
   };
 
   useEffect(() => {
     fetchPhotobooth();
-  }, []);
+  }, [refreshKey]);
 
-  const showNotification = (msg, type = 'success') => {
+  const showNotification = (msg, type = "success") => {
     setStatusMessage({ text: msg, type });
     setTimeout(() => setStatusMessage(null), 3500);
   };
@@ -72,8 +90,8 @@ export default function AdminPhotobooth() {
      IMAGE UPLOAD, DRAG & DROP AND BASE64 CANVAS COMPRESSION FOR SQL
      ========================================================================== */
   const processImageFile = (file) => {
-    if (!file || !file.type.startsWith('image/')) {
-      alert('Vui lòng chọn một file ảnh hợp lệ (PNG, JPG, WEBP)!');
+    if (!file || !file.type.startsWith("image/")) {
+      alert("Vui lòng chọn một file ảnh hợp lệ (PNG, JPG, WEBP)!");
       return;
     }
 
@@ -82,7 +100,7 @@ export default function AdminPhotobooth() {
       const img = new Image();
       img.onload = () => {
         // Compress image via Canvas to optimize SQL payload size
-        const canvas = document.createElement('canvas');
+        const canvas = document.createElement("canvas");
         const MAX_WIDTH = 1200;
         const MAX_HEIGHT = 1200;
         let width = img.width;
@@ -102,12 +120,12 @@ export default function AdminPhotobooth() {
 
         canvas.width = width;
         canvas.height = height;
-        const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext("2d");
         ctx.drawImage(img, 0, 0, width, height);
 
         // Convert canvas to compressed Base64 data URL string
-        const base64DataUrl = canvas.toDataURL('image/jpeg', 0.85);
-        setFormData(prev => ({ ...prev, image: base64DataUrl }));
+        const base64DataUrl = canvas.toDataURL("image/jpeg", 0.85);
+        setFormData((prev) => ({ ...prev, image: base64DataUrl }));
       };
       img.src = event.target?.result;
     };
@@ -147,30 +165,32 @@ export default function AdminPhotobooth() {
      PERKS / ĐẶC QUYỀN CRUD ACTIONS
      ========================================================================== */
   const handleAddPerk = (textToAdd) => {
-    const text = (typeof textToAdd === 'string' ? textToAdd : newPerkInput).trim();
+    const text = (
+      typeof textToAdd === "string" ? textToAdd : newPerkInput
+    ).trim();
     if (!text) return;
     if (formData.perks.includes(text)) {
-      alert('Đặc quyền này đã có trong danh sách!');
+      alert("Đặc quyền này đã có trong danh sách!");
       return;
     }
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      perks: [...prev.perks, text]
+      perks: [...prev.perks, text],
     }));
-    setNewPerkInput('');
+    setNewPerkInput("");
   };
 
   const handleRemovePerk = (indexToRemove) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      perks: prev.perks.filter((_, idx) => idx !== indexToRemove)
+      perks: prev.perks.filter((_, idx) => idx !== indexToRemove),
     }));
   };
 
   const handleEditPerk = (indexToEdit, newText) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      perks: prev.perks.map((p, idx) => idx === indexToEdit ? newText : p)
+      perks: prev.perks.map((p, idx) => (idx === indexToEdit ? newText : p)),
     }));
   };
 
@@ -179,38 +199,42 @@ export default function AdminPhotobooth() {
      ========================================================================== */
   const handleOpenAdd = () => {
     setEditingItem(null);
-    setNewPerkInput('');
+    setNewPerkInput("");
     setFormData({
-      code: `PB-${String(concepts.length + 1).padStart(2, '0')}`,
-      name: '',
-      description: 'Chụp 4 ô phong cách thanh lịch Hàn Quốc, in ảnh lấy ngay sau 30 giây.',
+      code: `PB-${String(concepts.length + 1).padStart(2, "0")}`,
+      name: "",
+      description:
+        "Chụp 4 ô phong cách thanh lịch Hàn Quốc, in ảnh lấy ngay sau 30 giây.",
       price: 70000,
-      image: '',
+      image: "",
       perks: [
-        'Miễn phí mượn 50+ phụ kiện',
-        'File ảnh gốc + Video GIF hậu trường',
-        'In 4 dải ảnh Strip Glossy cao cấp',
-        'Quét mã QR lấy file siêu tốc'
-      ]
+        "Miễn phí mượn 50+ phụ kiện",
+        "File ảnh gốc + Video GIF hậu trường",
+        "In 4 dải ảnh Strip Glossy cao cấp",
+        "Quét mã QR lấy file siêu tốc",
+      ],
     });
     setShowModal(true);
   };
 
   const handleOpenEdit = (item) => {
     setEditingItem(item);
-    setNewPerkInput('');
+    setNewPerkInput("");
     setFormData({
-      code: item.code || '',
-      name: item.name || '',
-      description: item.description || '',
+      code: item.code || "",
+      name: item.name || "",
+      description: item.description || "",
       price: item.price || 0,
-      image: item.image || '',
-      perks: Array.isArray(item.perks) && item.perks.length > 0 ? item.perks : [
-        'Miễn phí mượn 50+ phụ kiện',
-        'File ảnh gốc + Video GIF hậu trường',
-        'In 4 dải ảnh Strip Glossy cao cấp',
-        'Quét mã QR lấy file siêu tốc'
-      ]
+      image: item.image || "",
+      perks:
+        Array.isArray(item.perks) && item.perks.length > 0
+          ? item.perks
+          : [
+              "Miễn phí mượn 50+ phụ kiện",
+              "File ảnh gốc + Video GIF hậu trường",
+              "In 4 dải ảnh Strip Glossy cao cấp",
+              "Quét mã QR lấy file siêu tốc",
+            ],
     });
     setShowModal(true);
   };
@@ -218,134 +242,105 @@ export default function AdminPhotobooth() {
   const handleSave = async (e) => {
     e.preventDefault();
     if (!formData.name.trim()) {
-      alert('Vui lòng nhập tên khung ảnh / gói Photobooth!');
+      alert("Vui lòng nhập tên khung ảnh / gói Photobooth!");
       return;
     }
 
     if (!formData.image) {
-      alert('Vui lòng chọn hoặc kéo thả ảnh khung Photobooth từ thiết bị!');
+      alert("Vui lòng chọn hoặc kéo thả ảnh khung Photobooth từ thiết bị!");
       return;
     }
 
     try {
       if (editingItem) {
         // PUT Update
-        const res = await fetch(`/api/photobooth/${editingItem.id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData)
+        const res = await adminFetch(`/api/photobooth/${editingItem.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
         });
         const data = await res.json();
         if (data.success) {
-          showNotification('Cập nhật khung Photobooth & đặc quyền thành công vào PostgreSQL!');
+          showNotification("Cập nhật khung Photobooth & đặc quyền thành công!");
           setShowModal(false);
           fetchPhotobooth();
         } else {
-          alert(data.message || 'Lỗi khi cập nhật');
+          alert(data.message || "Lỗi khi cập nhật");
         }
       } else {
         // POST Create
-        const res = await fetch('/api/photobooth', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData)
+        const res = await adminFetch("/api/photobooth", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
         });
         const data = await res.json();
         if (data.success) {
-          showNotification('Thêm mới khung Photobooth & đặc quyền thành công vào SQL!');
+          showNotification("Thêm mới khung Photobooth & đặc quyền thành công!");
           setShowModal(false);
           fetchPhotobooth();
         } else {
-          alert(data.message || 'Lỗi khi thêm mới');
+          alert(data.message || "Lỗi khi thêm mới");
         }
       }
     } catch (err) {
-      console.error('Lỗi khi lưu Photobooth:', err);
-      alert('Có lỗi xảy ra khi lưu vào cơ sở dữ liệu!');
+      console.error("Lỗi khi lưu Photobooth:", err);
+      alert("Có lỗi xảy ra khi lưu vào cơ sở dữ liệu!");
     }
   };
 
   const handleDelete = async (id, name) => {
-    if (!window.confirm(`Bạn có chắc chắn muốn xóa khung Photobooth "${name}" khỏi cơ sở dữ liệu SQL?`)) {
+    if (
+      !window.confirm(
+        `Bạn có chắc chắn muốn xóa khung Photobooth "${name}" khỏi danh sách concept?`,
+      )
+    ) {
       return;
     }
 
     try {
-      const res = await fetch(`/api/photobooth/${id}`, {
-        method: 'DELETE'
+      const res = await adminFetch(`/api/photobooth/${id}`, {
+        method: "DELETE",
       });
       const data = await res.json();
       if (data.success) {
-        showNotification(`Đã xóa khung "${name}" khỏi PostgreSQL thành công!`);
+        showNotification(`Đã xóa khung "${name}" thành công!`);
         fetchPhotobooth();
       } else {
-        alert(data.message || 'Lỗi khi xóa');
+        alert(data.message || "Lỗi khi xóa");
       }
     } catch (err) {
-      console.error('Lỗi khi xóa Photobooth:', err);
-      alert('Không thể xóa khung Photobooth này!');
+      console.error("Lỗi khi xóa Photobooth:", err);
+      alert("Không thể xóa khung Photobooth này!");
     }
   };
 
   return (
     <div className="space-y-8 animate-fadeIn">
-      
-      {/* Top Header Card */}
-      <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-        <div className="space-y-1.5">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-amber-500 text-white flex items-center justify-center font-bold shadow-md">
-              <Camera className="w-5 h-5" />
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold font-serif-title text-slate-900 flex items-center gap-2">
-                Quản Lý Dịch Vụ Photobooth
-                <span className="badge-gold text-xs">{concepts.length} Khung Trong SQL</span>
-              </h2>
-              <p className="text-xs text-slate-500">
-                Tùy chỉnh ảnh khung từ thiết bị, sửa mô tả, quản lý danh sách đặc quyền đi kèm và đồng bộ thời gian thực với PostgreSQL.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-3 w-full sm:w-auto">
-          <button
-            onClick={() => {
-              setIsRefreshing(true);
-              fetchPhotobooth();
-            }}
-            className="p-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-2xl transition-all"
-            title="Tải lại từ PostgreSQL"
-          >
-            <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-amber-600' : ''}`} />
-          </button>
-
-          <button
-            onClick={handleOpenAdd}
-            className="btn-gold px-5 py-3 text-xs font-bold flex-1 sm:flex-initial justify-center shadow-lg shadow-amber-500/20 hover:scale-105 transition-all"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Thêm Khung / Gói Mới</span>
-          </button>
-        </div>
+      <div className="admin-module-toolbar">
+        <span>{concepts.length} concept</span>
+        <button className="button button-small" onClick={handleOpenAdd}>
+          <Plus size={15} />
+          Thêm concept
+        </button>
       </div>
 
       {/* Notification Toast */}
       {statusMessage && (
-        <div className={`p-4 rounded-2xl text-xs font-bold flex items-center gap-3 animate-in slide-in-from-top-2 ${
-          statusMessage.type === 'error'
-            ? 'bg-rose-50 text-rose-800 border border-rose-200'
-            : 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-        }`}>
+        <div
+          className={`p-4 rounded-2xl text-xs font-bold flex items-center gap-3 animate-in slide-in-from-top-2 ${
+            statusMessage.type === "error"
+              ? "bg-rose-50 text-rose-800 border border-rose-200"
+              : "bg-emerald-50 text-emerald-800 border border-emerald-200"
+          }`}
+        >
           <CheckCircle2 className="w-4 h-4" />
           <span>{statusMessage.text}</span>
         </div>
       )}
 
       {/* Main Grid: Management Table & Live Preview */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        
+      <div className="admin-concepts-grid grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Left: Photobooth Concepts List (8 Cols) */}
         <div className="lg:col-span-8 space-y-4">
           <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
@@ -354,18 +349,22 @@ export default function AdminPhotobooth() {
                 <Layers className="w-4 h-4 text-amber-600" />
                 Danh Sách Khung Ảnh & Mức Giá Hiện Hành
               </h3>
-              <span className="text-xs text-slate-500 font-medium">Bấm vào khung để xem thử Live Preview</span>
+              <span className="text-xs text-slate-500 font-medium">
+                Chọn concept; mở phần xem trước khi cần.
+              </span>
             </div>
 
             {loading ? (
               <div className="p-12 text-center text-slate-400 space-y-2">
                 <RefreshCw className="w-8 h-8 animate-spin mx-auto text-amber-500" />
-                <p className="text-xs">Đang tải dữ liệu từ PostgreSQL...</p>
+                <p className="text-xs">Đang tải concept…</p>
               </div>
             ) : concepts.length === 0 ? (
               <div className="p-12 text-center text-slate-500 space-y-3">
                 <Camera className="w-12 h-12 text-slate-300 mx-auto" />
-                <p className="text-xs font-medium">Chưa có khung Photobooth nào. Hãy nhấn "Thêm Khung / Gói Mới".</p>
+                <p className="text-xs font-medium">
+                  Chưa có khung Photobooth nào. Hãy nhấn "Thêm Khung / Gói Mới".
+                </p>
               </div>
             ) : (
               <div className="divide-y divide-slate-100">
@@ -375,13 +374,16 @@ export default function AdminPhotobooth() {
                     onClick={() => setSelectedPreview(concept)}
                     className={`p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 cursor-pointer transition-all ${
                       selectedPreview?.id === concept.id
-                        ? 'bg-amber-50/70 border-l-4 border-amber-500'
-                        : 'hover:bg-slate-50'
+                        ? "bg-amber-50/70 border-l-4 border-amber-500"
+                        : "hover:bg-slate-50"
                     }`}
                   >
                     <div className="flex items-center gap-4 flex-1">
                       <img
-                        src={concept.image || 'https://images.unsplash.com/photo-1527529482837-4698179dc6ce?auto=format&fit=crop&w=800&q=80'}
+                        src={
+                          concept.image ||
+                          "https://images.unsplash.com/photo-1527529482837-4698179dc6ce?auto=format&fit=crop&w=800&q=80"
+                        }
                         alt={concept.name}
                         className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-2xl bg-slate-100 border border-slate-200 shadow-sm flex-shrink-0"
                       />
@@ -394,13 +396,22 @@ export default function AdminPhotobooth() {
                             In Liền 30s
                           </span>
                           <span className="text-[10px] font-bold text-amber-800 bg-amber-100/80 px-2 py-0.5 rounded-md border border-amber-200">
-                            {Array.isArray(concept.perks) ? concept.perks.length : 4} Đặc Quyền
+                            {Array.isArray(concept.perks)
+                              ? concept.perks.length
+                              : 4}{" "}
+                            Đặc Quyền
                           </span>
                         </div>
-                        <h4 className="font-bold text-sm text-slate-900 leading-snug">{concept.name}</h4>
-                        <p className="text-xs text-slate-600 line-clamp-1">{concept.description || 'Chưa có mô tả'}</p>
+                        <h4 className="font-bold text-sm text-slate-900 leading-snug">
+                          {concept.name}
+                        </h4>
+                        <p className="text-xs text-slate-600 line-clamp-1">
+                          {concept.description || "Chưa có mô tả"}
+                        </p>
                         <div className="text-xs font-extrabold text-amber-800">
-                          Giá vé: {Number(concept.price || 0).toLocaleString('vi-VN')} VNĐ / 1 lượt
+                          Giá vé:{" "}
+                          {Number(concept.price || 0).toLocaleString("vi-VN")}{" "}
+                          VNĐ / 1 lượt
                         </div>
                       </div>
                     </div>
@@ -424,7 +435,7 @@ export default function AdminPhotobooth() {
                           handleDelete(concept.id, concept.name);
                         }}
                         className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors"
-                        title="Xóa khỏi PostgreSQL"
+                        title="Xóa concept"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -437,74 +448,101 @@ export default function AdminPhotobooth() {
         </div>
 
         {/* Right: Live Customer Interface Preview (4 Cols) */}
-        <div className="lg:col-span-4 space-y-4">
-          <div className="bg-slate-900 text-white p-6 rounded-3xl border border-slate-800 shadow-xl space-y-5 sticky top-24">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-              <span className="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
-                <Eye className="w-4 h-4 text-amber-400" />
-                Mô Phỏng Giao Diện Khách Hàng
-              </span>
-              <span className="text-[10px] text-slate-400">Live Preview</span>
-            </div>
+        <details className="admin-concept-preview">
+          <summary>Xem trước concept đã chọn</summary>
+          <div className="lg:col-span-4 space-y-4">
+            <div className="bg-slate-900 text-white p-6 rounded-3xl border border-slate-800 shadow-xl space-y-5 sticky top-24">
+              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                <span className="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <Eye className="w-4 h-4 text-amber-400" />
+                  Mô Phỏng Giao Diện Khách Hàng
+                </span>
+                <span className="text-[10px] text-slate-400">Live Preview</span>
+              </div>
 
-            {selectedPreview ? (
-              <div className="space-y-4">
-                <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-slate-950 border border-slate-800">
-                  <img
-                    src={selectedPreview.image || 'https://images.unsplash.com/photo-1527529482837-4698179dc6ce?auto=format&fit=crop&w=800&q=80'}
-                    alt={selectedPreview.name}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-transparent to-transparent flex items-end p-4">
-                    <div>
-                      <span className="text-[10px] font-bold text-amber-400 uppercase">{selectedPreview.code}</span>
-                      <h4 className="font-bold text-base text-white">{selectedPreview.name}</h4>
+              {selectedPreview ? (
+                <div className="space-y-4">
+                  <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-slate-950 border border-slate-800">
+                    <img
+                      src={
+                        selectedPreview.image ||
+                        "https://images.unsplash.com/photo-1527529482837-4698179dc6ce?auto=format&fit=crop&w=800&q=80"
+                      }
+                      alt={selectedPreview.name}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-transparent to-transparent flex items-end p-4">
+                      <div>
+                        <span className="text-[10px] font-bold text-amber-400 uppercase">
+                          {selectedPreview.code}
+                        </span>
+                        <h4 className="font-bold text-base text-white">
+                          {selectedPreview.name}
+                        </h4>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2 bg-slate-800/80 p-4 rounded-2xl border border-slate-700">
+                    <span className="text-[10px] text-amber-400 font-bold uppercase block">
+                      Mức Giá & Mô Tả Cho Khách:
+                    </span>
+                    <div className="text-2xl font-black text-amber-300 font-serif-title">
+                      {Number(selectedPreview.price || 0).toLocaleString(
+                        "vi-VN",
+                      )}{" "}
+                      VNĐ
+                    </div>
+                    <p className="text-xs text-slate-300 leading-relaxed font-normal">
+                      {selectedPreview.description ||
+                        "Chưa có mô tả phong cảnh."}
+                    </p>
+                  </div>
+
+                  <div className="space-y-2 pt-1">
+                    <span className="text-[11px] font-bold text-amber-400 uppercase tracking-wider block">
+                      Đặc Quyền Đi Kèm (
+                      {Array.isArray(selectedPreview.perks)
+                        ? selectedPreview.perks.length
+                        : 4}
+                      ):
+                    </span>
+                    <div className="space-y-1.5">
+                      {(Array.isArray(selectedPreview.perks) &&
+                      selectedPreview.perks.length > 0
+                        ? selectedPreview.perks
+                        : [
+                            "Miễn phí mượn 50+ phụ kiện",
+                            "File ảnh gốc + Video GIF hậu trường",
+                            "In 4 dải ảnh Strip Glossy cao cấp",
+                            "Quét mã QR lấy file siêu tốc",
+                          ]
+                      ).map((perk, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-center gap-2 text-xs text-slate-200"
+                        >
+                          <CheckCircle className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
+                          <span>{perk}</span>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </div>
-
-                <div className="space-y-2 bg-slate-800/80 p-4 rounded-2xl border border-slate-700">
-                  <span className="text-[10px] text-amber-400 font-bold uppercase block">Mức Giá & Mô Tả Cho Khách:</span>
-                  <div className="text-2xl font-black text-amber-300 font-serif-title">
-                    {Number(selectedPreview.price || 0).toLocaleString('vi-VN')} VNĐ
-                  </div>
-                  <p className="text-xs text-slate-300 leading-relaxed font-normal">
-                    {selectedPreview.description || 'Chưa có mô tả phong cảnh.'}
-                  </p>
-                </div>
-
-                <div className="space-y-2 pt-1">
-                  <span className="text-[11px] font-bold text-amber-400 uppercase tracking-wider block">
-                    Đặc Quyền Đi Kèm ({Array.isArray(selectedPreview.perks) ? selectedPreview.perks.length : 4}):
-                  </span>
-                  <div className="space-y-1.5">
-                    {(Array.isArray(selectedPreview.perks) && selectedPreview.perks.length > 0 ? selectedPreview.perks : [
-                      'Miễn phí mượn 50+ phụ kiện',
-                      'File ảnh gốc + Video GIF hậu trường',
-                      'In 4 dải ảnh Strip Glossy cao cấp',
-                      'Quét mã QR lấy file siêu tốc'
-                    ]).map((perk, idx) => (
-                      <div key={idx} className="flex items-center gap-2 text-xs text-slate-200">
-                        <CheckCircle className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
-                        <span>{perk}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <p className="text-xs text-slate-400 text-center py-8">Chọn một khung để xem mô phỏng.</p>
-            )}
+              ) : (
+                <p className="text-xs text-slate-400 text-center py-8">
+                  Chọn một khung để xem mô phỏng.
+                </p>
+              )}
+            </div>
           </div>
-        </div>
-
+        </details>
       </div>
 
       {/* Modal: Create / Edit Photobooth Concept */}
       {showModal && (
         <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
           <div className="bg-white max-w-xl w-full rounded-3xl p-6 sm:p-8 space-y-6 border border-slate-100 shadow-2xl my-8 animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
-            
             {/* Modal Header */}
             <div className="flex items-center justify-between border-b border-slate-100 pb-4">
               <div className="flex items-center gap-2.5">
@@ -513,9 +551,13 @@ export default function AdminPhotobooth() {
                 </div>
                 <div>
                   <h3 className="font-bold text-lg text-slate-900 font-serif-title">
-                    {editingItem ? 'Chỉnh Sửa Khung & Đặc Quyền Photobooth' : 'Thêm Mới Khung Photobooth'}
+                    {editingItem
+                      ? "Chỉnh Sửa Khung & Đặc Quyền Photobooth"
+                      : "Thêm Mới Khung Photobooth"}
                   </h3>
-                  <span className="text-xs text-slate-500">Tải ảnh từ máy tính & Lưu trực tiếp vào PostgreSQL</span>
+                  <span className="text-xs text-slate-500">
+                    Tải ảnh từ thiết bị của bạn
+                  </span>
                 </div>
               </div>
 
@@ -531,25 +573,36 @@ export default function AdminPhotobooth() {
             <form onSubmit={handleSave} className="space-y-4 text-xs">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Mã Khung / Gói *</label>
+                  <label className="font-bold text-slate-700 block mb-1">
+                    Mã Khung / Gói *
+                  </label>
                   <input
                     type="text"
                     required
                     value={formData.code}
-                    onChange={(e) => setFormData({ ...formData, code: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, code: e.target.value })
+                    }
                     className="w-full bg-slate-50 border border-slate-200 p-2.5 rounded-xl font-mono font-bold text-slate-900 focus:outline-none focus:border-amber-500"
                     placeholder="VD: PB-01"
                   />
                 </div>
 
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Mức Giá Vé / Lượt (VNĐ) *</label>
+                  <label className="font-bold text-slate-700 block mb-1">
+                    Mức Giá Vé / Lượt (VNĐ) *
+                  </label>
                   <input
                     type="number"
                     required
                     step="5000"
                     value={formData.price}
-                    onChange={(e) => setFormData({ ...formData, price: parseInt(e.target.value, 10) || 0 })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        price: parseInt(e.target.value, 10) || 0,
+                      })
+                    }
                     className="w-full bg-slate-50 border border-slate-200 p-2.5 rounded-xl font-bold text-amber-800 focus:outline-none focus:border-amber-500"
                     placeholder="VD: 70000"
                   />
@@ -557,24 +610,32 @@ export default function AdminPhotobooth() {
               </div>
 
               <div>
-                <label className="font-bold text-slate-700 block mb-1">Tên Khung Ảnh / Gói Chụp *</label>
+                <label className="font-bold text-slate-700 block mb-1">
+                  Tên Khung Ảnh / Gói Chụp *
+                </label>
                 <input
                   type="text"
                   required
                   value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
                   className="w-full bg-slate-50 border border-slate-200 p-2.5 rounded-xl font-bold text-slate-900 focus:outline-none focus:border-amber-500"
                   placeholder="VD: Korean Vintage 4-Cut Frame"
                 />
               </div>
 
               <div>
-                <label className="font-bold text-slate-700 block mb-1">Mô Tả Chi Tiết & Phong Cách (Hiển thị cho khách) *</label>
+                <label className="font-bold text-slate-700 block mb-1">
+                  Mô Tả Chi Tiết & Phong Cách (Hiển thị cho khách) *
+                </label>
                 <textarea
                   rows={2}
                   required
                   value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, description: e.target.value })
+                  }
                   className="w-full bg-slate-50 border border-slate-200 p-2.5 rounded-xl text-slate-800 focus:outline-none focus:border-amber-500 font-medium"
                   placeholder="VD: Phong cảnh trong phòng ngủ, ánh sáng ấm áp..."
                 />
@@ -584,7 +645,7 @@ export default function AdminPhotobooth() {
               <div className="space-y-2 pt-1">
                 <label className="font-bold text-slate-800 flex items-center gap-1.5">
                   <ImageIcon className="w-4 h-4 text-amber-600" />
-                  <span>Hình Ảnh Khung Photobooth (Tải file từ thiết bị - Lưu vào SQL) *:</span>
+                  <span>Hình Ảnh Khung Photobooth *:</span>
                 </label>
 
                 {/* Dropzone */}
@@ -595,8 +656,8 @@ export default function AdminPhotobooth() {
                   onClick={() => fileInputRef.current?.click()}
                   className={`border-2 border-dashed rounded-2xl p-4 cursor-pointer text-center transition-all flex flex-col items-center justify-center gap-1.5 group ${
                     isDragging
-                      ? 'border-amber-500 bg-amber-100/60 scale-[1.01]'
-                      : 'border-amber-300 hover:border-amber-500 bg-amber-50/50 hover:bg-amber-50'
+                      ? "border-amber-500 bg-amber-100/60 scale-[1.01]"
+                      : "border-amber-300 hover:border-amber-500 bg-amber-50/50 hover:bg-amber-50"
                   }`}
                 >
                   <input
@@ -611,10 +672,13 @@ export default function AdminPhotobooth() {
                   </div>
                   <div>
                     <p className="text-xs font-bold text-slate-800">
-                      {isDragging ? 'Thả ảnh vào đây ngay' : 'Kéo thả ảnh hoặc nhấp để chọn từ máy tính'}
+                      {isDragging
+                        ? "Thả ảnh vào đây ngay"
+                        : "Kéo thả ảnh hoặc nhấp để chọn từ máy tính"}
                     </p>
                     <p className="text-[10px] text-slate-500">
-                      Hỗ trợ PNG, JPG, JPEG, WEBP (Tự động nén & lưu trực tiếp vào CSDL PostgreSQL)
+                      Hỗ trợ PNG, JPG, JPEG, WEBP · Ảnh được tối ưu trước khi
+                      lưu
                     </p>
                   </div>
                 </div>
@@ -629,12 +693,14 @@ export default function AdminPhotobooth() {
                     />
                     <div className="absolute top-2 left-2 bg-slate-900/80 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] font-bold text-amber-300 border border-slate-700 flex items-center gap-1">
                       <ShieldCheck className="w-3 h-3 text-emerald-400" />
-                      <span>Xem Trước Ảnh Sẽ Lưu SQL</span>
+                      <span>Xem trước hình ảnh</span>
                     </div>
 
                     <button
                       type="button"
-                      onClick={() => setFormData(prev => ({ ...prev, image: '' }))}
+                      onClick={() =>
+                        setFormData((prev) => ({ ...prev, image: "" }))
+                      }
                       className="absolute top-2 right-2 p-1.5 rounded-full bg-rose-600 text-white hover:bg-rose-700 shadow-md transition-colors"
                       title="Xóa ảnh để chọn lại"
                     >
@@ -651,14 +717,20 @@ export default function AdminPhotobooth() {
                 <div className="flex items-center justify-between">
                   <label className="font-bold text-slate-800 flex items-center gap-1.5">
                     <Sparkles className="w-4 h-4 text-amber-600" />
-                    <span>Quản Lý Đặc Quyền Đi Kèm Lượt Chụp ({formData.perks.length}):</span>
+                    <span>
+                      Quản Lý Đặc Quyền Đi Kèm Lượt Chụp (
+                      {formData.perks.length}):
+                    </span>
                   </label>
                 </div>
 
                 {/* List of current perks */}
                 <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
                   {formData.perks.map((perk, index) => (
-                    <div key={index} className="flex items-center gap-2 bg-slate-50 p-2 rounded-xl border border-slate-200 group">
+                    <div
+                      key={index}
+                      className="flex items-center gap-2 bg-slate-50 p-2 rounded-xl border border-slate-200 group"
+                    >
                       <CheckCircle className="w-4 h-4 text-emerald-600 flex-shrink-0" />
                       <input
                         type="text"
@@ -686,7 +758,7 @@ export default function AdminPhotobooth() {
                     value={newPerkInput}
                     onChange={(e) => setNewPerkInput(e.target.value)}
                     onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
+                      if (e.key === "Enter") {
                         e.preventDefault();
                         handleAddPerk(newPerkInput);
                       }
@@ -739,15 +811,13 @@ export default function AdminPhotobooth() {
                   className="btn-gold px-6 py-2.5 rounded-xl font-bold shadow-md"
                 >
                   <Check className="w-4 h-4" />
-                  <span>{editingItem ? 'Lưu Thay Đổi Vào SQL' : 'Lưu Khung Ảnh Vào SQL'}</span>
+                  <span>{editingItem ? "Lưu thay đổi" : "Lưu concept"}</span>
                 </button>
               </div>
             </form>
-
           </div>
         </div>
       )}
-
     </div>
   );
 }

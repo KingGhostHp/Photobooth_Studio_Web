@@ -1,12 +1,12 @@
-# Use official Node.js 20 LTS lightweight image
-FROM node:20-alpine
+# Node 22 aligns with the Vite build environment.
+FROM node:22-alpine
 
 # Set working directory
 WORKDIR /app
 
 # Copy package files and install dependencies
 COPY package*.json ./
-RUN npm install --omit=dev
+RUN npm ci --omit=dev
 
 # Copy application source code
 COPY . .

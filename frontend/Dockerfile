@@ -1,5 +1,5 @@
-# Stage 1: Build Vite React Production Bundle using Node.js 20 LTS (required for Vite 6 / Rolldown styleText)
-FROM node:20-alpine AS build
+# Stage 1: Vite production build (Node 22).
+FROM node:22-alpine AS build
 
 WORKDIR /app
 

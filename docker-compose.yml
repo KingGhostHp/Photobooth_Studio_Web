@@ -4,13 +4,18 @@ services:
     container_name: aura-studio-db
     environment:
       - POSTGRES_USER=aura_admin
-      - POSTGRES_PASSWORD=aura_password_2026
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
       - POSTGRES_DB=aura_studio_db
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aura_admin -d aura_studio_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
     networks:
       - aura-network
 
@@ -20,15 +25,19 @@ services:
       dockerfile: Dockerfile
     container_name: aura-studio-backend
     ports:
-      - "5000:5000"
+      - "127.0.0.1:5000:5000"
     environment:
       - PORT=5000
       - NODE_ENV=production
-      - DATABASE_URL=postgresql://aura_admin:aura_password_2026@postgres:5432/aura_studio_db
-      - EMAIL_USER=giautenbantoan@gmail.com
-      - EMAIL_PASS=xepuozagwxcboafu
+      - DATABASE_URL=postgresql://aura_admin:${POSTGRES_PASSWORD}@postgres:5432/aura_studio_db
+      - APP_ORIGIN=${APP_ORIGIN:-http://localhost}
+      - ADMIN_USERNAME=${ADMIN_USERNAME:-admin}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:?Set ADMIN_PASSWORD in .env}
+      - CHECKOUT_SECRET=${CHECKOUT_SECRET:?Set CHECKOUT_SECRET in .env}
+      - PAYMENT_WEBHOOK_SECRET=${PAYMENT_WEBHOOK_SECRET:?Set PAYMENT_WEBHOOK_SECRET in .env}
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     restart: always
     networks:
       - aura-network
@@ -39,7 +48,7 @@ services:
       dockerfile: Dockerfile
     container_name: aura-studio-frontend
     ports:
-      - "80:80"
+      - "127.0.0.1:80:80"
     depends_on:
       - backend
     restart: always

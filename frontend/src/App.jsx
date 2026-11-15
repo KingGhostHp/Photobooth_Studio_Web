@@ -1,276 +1,269 @@
-import React, { useState, useEffect } from 'react';
-import Header from './components/common/Header';
-import Footer from './components/common/Footer';
-import HeroSection from './components/customer/HeroSection';
-import HeroBannerCarousel from './components/customer/HeroBannerCarousel';
-import CostumesCatalog from './components/customer/CostumesCatalog';
-import OrderLookupSection from './components/customer/OrderLookupSection';
-import ComboPackagesSection from './components/customer/ComboPackagesSection';
-import PhotoboothSection from './components/customer/PhotoboothSection';
-import LookbookSection from './components/customer/LookbookSection';
-import CartDrawer from './components/customer/CartDrawer';
-
-import AdminSidebar from './components/admin/AdminSidebar';
-import AdminHeader from './components/admin/AdminHeader';
-import AdminDashboard from './components/admin/AdminDashboard';
-import AdminInventory from './components/admin/AdminInventory';
-import AdminCalendar from './components/admin/AdminCalendar';
-import AdminOrders from './components/admin/AdminOrders';
-import AdminPhotobooth from './components/admin/AdminPhotobooth';
-import AdminPricing from './components/admin/AdminPricing';
-import AdminBanners from './components/admin/AdminBanners';
-import AdminPaymentSettings from './components/admin/AdminPaymentSettings';
-
+import { lazy, Suspense, useCallback, useEffect, useState } from "react";
+import { MotionConfig, AnimatePresence, motion } from "motion/react";
+import { Check, ArrowUpRight, ShoppingBag } from "lucide-react";
+import { api, stored, save } from "./studio/api";
+import {
+  Header,
+  Footer,
+  Home,
+  Collection,
+  Packages,
+  Photobooth,
+  Lookbook,
+  ProductDetails,
+  PackageOptions,
+} from "./studio/Storefront";
+import { ErrorState, Empty } from "./studio/UI";
+import Checkout from "./studio/Checkout";
+import Lookup from "./studio/Lookup";
+const Admin = lazy(() => import("./studio/Admin"));
+function locationRoute() {
+  const hash = window.location.hash.slice(1) || "/";
+  const [path, query = ""] = hash.split("?");
+  return { path, query };
+}
 export default function App() {
-  const [currentTab, setCurrentTab] = useState('home');
-  const [selectedCostumeCategory, setSelectedCostumeCategory] = useState('all');
-  const [activeAdminTab, setActiveAdminTab] = useState('dashboard');
-  const [isAdminMode, setIsAdminMode] = useState(false);
-  const [isAdminMobileMenuOpen, setIsAdminMobileMenuOpen] = useState(false);
-  
-  const [cartItems, setCartItems] = useState([]);
-  const [isCartOpen, setIsCartOpen] = useState(false);
-  const [selectedPackageForBooking, setSelectedPackageForBooking] = useState(null);
-
-  const [orders, setOrders] = useState([]);
-  const [ordersLoading, setOrdersLoading] = useState(true);
-
-  // Fetch orders from PostgreSQL
-  const fetchOrders = async () => {
-    try {
-      const res = await fetch('/api/orders');
-      const data = await res.json();
-      if (data.success && Array.isArray(data.data)) {
-        setOrders(data.data);
-      }
-    } catch (err) {
-      console.error('Lỗi khi tải danh sách đơn hàng:', err);
-    } finally {
-      setOrdersLoading(false);
-    }
-  };
-
+  const [location, setLocation] = useState(locationRoute);
+  const admin = location.path === "/admin";
+  const [catalog, setCatalog] = useState(null);
+  const [error, setError] = useState(null);
+  const [cart, setCart] = useState(() => {
+    const data = stored("aura-cart-v2", []);
+    return Array.isArray(data)
+      ? data.filter(
+          (i) =>
+            i && ["costume", "package", "photobooth"].includes(i.type) && i.id,
+        )
+      : [];
+  });
+  const [cartOpen, setCartOpen] = useState(false);
+  const [product, setProduct] = useState(null);
+  const [pkg, setPkg] = useState(null);
+  const [toast, setToast] = useState("");
   useEffect(() => {
-    fetchOrders();
+    const handler = () => {
+      setLocation(locationRoute());
+      setProduct(null);
+      setPkg(null);
+      window.scrollTo({ top: 0, behavior: "instant" });
+    };
+    window.addEventListener("hashchange", handler);
+    return () => window.removeEventListener("hashchange", handler);
   }, []);
-
-  // 5-Second Visitor Retention Tracker (Lấy thời điểm 1 người truy cập web tối thiểu 5s tính là 1 lần)
+  const load = useCallback(async () => {
+    setError(null);
+    try {
+      const names = [
+        "costumes",
+        "categories",
+        "packages",
+        "addons",
+        "photobooth",
+        "banners",
+      ];
+      const data = await Promise.all(names.map((name) => api(`/${name}`)));
+      setCatalog(
+        Object.fromEntries(names.map((name, i) => [name, data[i].data])),
+      );
+    } catch (e) {
+      setError(e);
+    }
+  }, []);
   useEffect(() => {
-    // Check if tracked in current browser session
-    const hasTrackedSession = sessionStorage.getItem('aura_tracked_visit_5s');
-    if (hasTrackedSession) return;
-
-    // Get or create persistent visitor ID
-    let visitorId = localStorage.getItem('aura_visitor_id');
-    if (!visitorId) {
-      visitorId = 'VISITOR-' + Math.random().toString(36).substring(2, 9).toUpperCase();
-      localStorage.setItem('aura_visitor_id', visitorId);
+    if (!admin) {
+      setCatalog(null);
+      load();
     }
-
-    const timer = setTimeout(() => {
-      fetch('/api/analytics/track-visit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          visitorId,
-          duration: 5,
-          pageUrl: window.location.pathname + window.location.hash,
-          userAgent: navigator.userAgent
-        })
-      })
-        .then(res => res.json())
-        .then(() => {
-          sessionStorage.setItem('aura_tracked_visit_5s', 'true');
-        })
-        .catch(err => console.warn('Visitor tracking error:', err));
-    }, 5000); // 5000ms = 5 seconds
-
-    return () => clearTimeout(timer);
+  }, [load, admin]);
+  useEffect(() => {
+    save("aura-cart-v2", cart);
+  }, [cart]);
+  useEffect(() => {
+    if (!toast) return;
+    const id = setTimeout(() => setToast(""), 3200);
+    return () => clearTimeout(id);
+  }, [toast]);
+  useEffect(() => {
+    // Optional analytics stays off until its purpose and user controls are defined.
+    try { localStorage.removeItem("aura-visitor-v2"); } catch { /* storage unavailable */ }
   }, []);
-
-  const handleAddToCart = (item) => {
-    setCartItems(prev => [...prev, item]);
-    setIsCartOpen(true);
-  };
-
-  const handleRemoveFromCart = (index) => {
-    setCartItems(prev => prev.filter((_, i) => i !== index));
-  };
-
-  const handleSelectPackageForBooking = (pkg) => {
-    setSelectedPackageForBooking(pkg);
-    setCurrentTab('booking');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleCompleteBooking = (newBookingOrder) => {
-    if (newBookingOrder) {
-      setOrders(prev => [newBookingOrder, ...prev.filter(o => o.id !== newBookingOrder.id)]);
+  useEffect(() => {
+    const titles = {
+      "/": "Studio & Wardrobe",
+      "/costumes": "Tủ trang phục",
+      "/packages": "Gói chụp",
+      "/photobooth": "Đặt lịch Photobooth",
+      "/lookbook": "Lookbook",
+      "/lookup": "Tra cứu lịch hẹn",
+      "/admin": "Quản trị studio",
+    };
+    document.title = `${titles[location.path] || "Khám phá"} — Aura Studio`;
+  }, [location.path]);
+  const add = (item) => {
+    if (item.type !== "costume" && cart.some((i) => i.type !== "costume")) {
+      setToast(
+        "Mỗi đơn nhận một gói chụp hoặc Photobooth. Hãy hoàn tất hoặc bỏ dịch vụ đã chọn.",
+      );
+      return;
     }
-    setCartItems([]);
-    fetchOrders();
+    setCart((previous) => {
+      const index = previous.findIndex(
+        (i) => i.type === item.type && i.id === item.id && i.size === item.size,
+      );
+      return index >= 0
+        ? previous.map((i, n) =>
+            n === index ? { ...i, quantity: i.quantity + item.quantity } : i,
+          )
+        : [...previous, { ...item, key: crypto.randomUUID() }];
+    });
+    setProduct(null);
+    setPkg(null);
+    setToast("Đã thêm vào giỏ dịch vụ của bạn.");
+    if (item.type !== "costume") setCartOpen(true);
   };
-
-  const handleUpdateOrder = async (updatedOrder) => {
-    try {
-      const res = await fetch(`/api/orders/${updatedOrder.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updatedOrder)
-      });
-      const data = await res.json();
-      if (data.success && data.data) {
-        setOrders(prev => prev.map(o => o.id === updatedOrder.id ? data.data : o));
-      } else {
-        setOrders(prev => prev.map(o => o.id === updatedOrder.id ? updatedOrder : o));
-      }
-    } catch (err) {
-      console.error('Lỗi khi cập nhật đơn hàng:', err);
-      setOrders(prev => prev.map(o => o.id === updatedOrder.id ? updatedOrder : o));
+  let page = null;
+  if (catalog) {
+    switch (location.path) {
+      case "/":
+        page = (
+          <Home catalog={catalog} onProduct={setProduct} onPackage={setPkg} />
+        );
+        break;
+      case "/costumes":
+        page = (
+          <Collection
+            key={location.query}
+            catalog={catalog}
+            onSelect={setProduct}
+            query={location.query}
+          />
+        );
+        break;
+      case "/packages":
+        page = <Packages catalog={catalog} onSelect={setPkg} />;
+        break;
+      case "/photobooth":
+        page = <Photobooth catalog={catalog} onAdd={add} />;
+        break;
+      case "/lookbook":
+        page = <Lookbook />;
+        break;
+      case "/lookup":
+        page = <Lookup />;
+        break;
+      default:
+        page = (
+          <Empty
+            title="Trang này chưa có trong câu chuyện"
+            action={
+              <a href="#/" className="button">
+                Về trang chủ <ArrowUpRight size={16} />
+              </a>
+            }
+          >
+            Cùng trở lại Aura và chọn một trải nghiệm khác nhé.
+          </Empty>
+        );
     }
-  };
-
-  const handleDeleteOrder = async (orderId) => {
-    try {
-      await fetch(`/api/orders/${orderId}`, { method: 'DELETE' });
-      setOrders(prev => prev.filter(o => o.id !== orderId));
-    } catch (err) {
-      console.error('Lỗi khi xóa đơn hàng:', err);
-    }
-  };
-
+  }
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans selection:bg-amber-500/20 selection:text-amber-900">
-      {isAdminMode ? (
-        /* Admin Management Portal View */
-        <div className="flex min-h-screen bg-slate-900 text-slate-100">
-          <AdminSidebar 
-            activeAdminTab={activeAdminTab} 
-            setActiveAdminTab={setActiveAdminTab} 
-            setIsAdminMode={setIsAdminMode}
-            isMobileOpen={isAdminMobileMenuOpen}
-            onCloseMobile={() => setIsAdminMobileMenuOpen(false)}
-          />
-          <div className="flex-1 flex flex-col min-w-0 bg-slate-900">
-            <AdminHeader 
-              activeAdminTab={activeAdminTab} 
-              setIsAdminMode={setIsAdminMode} 
-              onToggleMobileMenu={() => setIsAdminMobileMenuOpen(!isAdminMobileMenuOpen)}
-            />
-            <main className="p-3 sm:p-6 lg:p-8 flex-1">
-              {activeAdminTab === 'dashboard' && (
-                <AdminDashboard orders={orders} onNavigateTab={setActiveAdminTab} />
-              )}
-              {activeAdminTab === 'payment' && (
-                <AdminPaymentSettings orders={orders} onRefreshOrders={fetchOrders} />
-              )}
-              {activeAdminTab === 'inventory' && <AdminInventory />}
-              {activeAdminTab === 'photobooth' && <AdminPhotobooth />}
-              {activeAdminTab === 'pricing' && <AdminPricing />}
-              {activeAdminTab === 'calendar' && (
-                <AdminCalendar 
-                  orders={orders} 
-                  onUpdateOrder={handleUpdateOrder} 
-                  onRefreshOrders={fetchOrders} 
-                />
-              )}
-              {activeAdminTab === 'orders' && (
-                <AdminOrders 
-                  orders={orders} 
-                  onUpdateOrder={handleUpdateOrder} 
-                  onDeleteOrder={handleDeleteOrder}
-                  onRefreshOrders={fetchOrders}
-                />
-              )}
-              {activeAdminTab === 'cms' && <AdminBanners />}
-              {activeAdminTab === 'staff' && (
-                <div className="glass-panel p-8 text-center space-y-4 max-w-2xl mx-auto text-slate-900">
-                  <h3 className="text-xl font-bold text-slate-900">Quản lý Nhân sự & Nhiếp ảnh gia</h3>
-                  <p className="text-xs text-slate-600">Phân hệ quản lý lịch làm việc và phân ca nhiếp ảnh gia, chuyên viên trang điểm.</p>
-                </div>
-              )}
-            </main>
-          </div>
-        </div>
+    <MotionConfig reducedMotion="user">
+      <a
+        href="#main-content"
+        className="skip-link"
+        onClick={(e) => {
+          e.preventDefault();
+          document.getElementById("main-content")?.focus();
+        }}
+      >
+        Bỏ qua điều hướng
+      </a>
+      {admin ? (
+        <Suspense
+          fallback={<div className="loading-screen">Đang mở studio…</div>}
+        >
+          <Admin />
+        </Suspense>
       ) : (
-        /* Customer Web Portal View */
         <>
-          <Header 
-            currentTab={currentTab} 
-            setCurrentTab={setCurrentTab} 
-            selectedCategory={selectedCostumeCategory}
-            onSelectCategory={(catId) => {
-              setSelectedCostumeCategory(catId);
-              setCurrentTab('costumes');
-            }}
-            cartCount={cartItems.length}
-            onOpenCart={() => setIsCartOpen(true)}
-            onOpenSearch={() => {
-              setSelectedCostumeCategory('all');
-              setCurrentTab('costumes');
-            }}
-            isAdminMode={isAdminMode}
-            setIsAdminMode={setIsAdminMode}
+          <Header
+            route={location.path}
+            count={cart.reduce((s, i) => s + i.quantity, 0)}
+            openCart={() => setCartOpen(true)}
           />
-
-          <main className="flex-1">
-            {currentTab === 'home' && (
-              <>
-                <HeroBannerCarousel 
-                  onOpenBooking={() => setCurrentTab('photobooth')} 
-                  onSelectTab={(tab) => setCurrentTab(tab)} 
-                />
-                <HeroSection setCurrentTab={setCurrentTab} />
-                <CostumesCatalog 
-                  onAddToCart={handleAddToCart} 
-                  selectedCategory={selectedCostumeCategory}
-                  setSelectedCategory={setSelectedCostumeCategory}
-                />
-                <ComboPackagesSection onAddToCart={handleAddToCart} />
-                <PhotoboothSection onCompleteBooking={handleCompleteBooking} />
-                <OrderLookupSection />
-                <LookbookSection />
-              </>
-            )}
-
-            {currentTab === 'costumes' && (
-              <CostumesCatalog 
-                onAddToCart={handleAddToCart} 
-                selectedCategory={selectedCostumeCategory}
-                setSelectedCategory={setSelectedCostumeCategory}
-              />
-            )}
-
-            {currentTab === 'lookup' && (
-              <OrderLookupSection />
-            )}
-
-            {(currentTab === 'combo' || currentTab === 'packages') && (
-              <ComboPackagesSection onAddToCart={handleAddToCart} />
-            )}
-
-            {(currentTab === 'photobooth' || currentTab === 'booking') && (
-              <PhotoboothSection onCompleteBooking={handleCompleteBooking} />
-            )}
-
-            {currentTab === 'lookbook' && (
-              <LookbookSection />
+          <main id="main-content" tabIndex="-1">
+            {error ? (
+              <div className="container page-space">
+                <ErrorState error={error} retry={load} />
+              </div>
+            ) : !catalog ? (
+              <div className="container page-space loading-catalog">
+                <span className="wordmark">aura✳</span>
+                <p>Đang chuẩn bị những điều đẹp đẽ…</p>
+                <div className="loading-line" />
+              </div>
+            ) : (
+              page
             )}
           </main>
-
-          <CartDrawer 
-            isOpen={isCartOpen}
-            onClose={() => setIsCartOpen(false)}
-            cartItems={cartItems}
-            onRemoveFromCart={handleRemoveFromCart}
-            onClearCart={() => setCartItems([])}
-            onProceedToBooking={() => setCurrentTab('combo')}
-            onCompleteBooking={handleCompleteBooking}
-          />
-
-          <Footer setCurrentTab={setCurrentTab} />
+          <Footer />
         </>
       )}
-    </div>
+      {product && (
+        <ProductDetails
+          key={product.id}
+          item={product}
+          onClose={() => setProduct(null)}
+          onAdd={add}
+        />
+      )}
+      {pkg && (
+        <PackageOptions
+          key={pkg.id}
+          item={pkg}
+          addons={catalog?.addons || []}
+          onClose={() => setPkg(null)}
+          onAdd={add}
+        />
+      )}
+      <AnimatePresence>
+        {cartOpen && (
+          <Checkout
+            key="checkout"
+            items={cart}
+            onChange={setCart}
+            onClose={() => setCartOpen(false)}
+            onDone={() => {
+              setCart([]);
+              load();
+            }}
+          />
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {toast && (
+          <motion.div
+            className="toast"
+            role="status"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 8 }}
+          >
+            <Check size={18} />
+            <span>{toast}</span>
+            {cart.length > 0 && (
+              <button
+                onClick={() => {
+                  setToast("");
+                  setCartOpen(true);
+                }}
+              >
+                Xem giỏ <ShoppingBag size={14} />
+              </button>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </MotionConfig>
   );
 }

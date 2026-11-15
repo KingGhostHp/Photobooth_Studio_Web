@@ -1,0 +1,420 @@
+{
+  "researchedOn": "2026-11-04",
+  "timezone": "Asia/Saigon",
+  "scope": "Selected upstream READMEs, official docs and examples; not a full source audit or runtime compatibility test.",
+  "sources": [
+    {
+      "id": 1,
+      "name": "Remotion",
+      "repository": "https://github.com/remotion-dev/remotion",
+      "defaultBranch": "main",
+      "commit": "c6e839dbb38dcc44cb1f52718f4e61b72f56d990",
+      "readmePath": "README.md",
+      "readmeUrl": "https://github.com/remotion-dev/remotion/blob/c6e839dbb38dcc44cb1f52718f4e61b72f56d990/README.md",
+      "rawUrl": "https://raw.githubusercontent.com/remotion-dev/remotion/c6e839dbb38dcc44cb1f52718f4e61b72f56d990/README.md",
+      "readmeSha256": "4c6717ce4a4f556300edf18cb8c64965786754649889353599b3435810268e58",
+      "fetchedAt": "2026-11-03T17:10:39.401Z"
+    },
+    {
+      "id": 2,
+      "name": "Remotion Skills",
+      "repository": "https://github.com/remotion-dev/skills",
+      "defaultBranch": "main",
+      "commit": "c7cb2fdcacd134fb2ccb9b7a44f9ffa44e467271",
+      "readmePath": "README.md",
+      "readmeUrl": "https://github.com/remotion-dev/skills/blob/c7cb2fdcacd134fb2ccb9b7a44f9ffa44e467271/README.md",
+      "rawUrl": "https://raw.githubusercontent.com/remotion-dev/skills/c7cb2fdcacd134fb2ccb9b7a44f9ffa44e467271/README.md",
+      "readmeSha256": "79241f8ff6e82d0e9e9976cac579ed86b05d3e63527ce7493b5081a8c38a0f2e",
+      "fetchedAt": "2026-11-03T17:10:38.836Z",
+      "additionalReadings": [
+        {
+          "sha256": "a82594faec39d4d793c8dca8a0ac7e78da74e19526da2b35d7de149cab4b2754",
+          "path": "skills/remotion-markup/SKILL.md",
+          "url": "https://github.com/remotion-dev/skills/blob/c7cb2fdcacd134fb2ccb9b7a44f9ffa44e467271/skills/remotion-markup/SKILL.md"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Anime.js",
+      "repository": "https://github.com/juliangarnier/anime",
+      "defaultBranch": "master",
+      "commit": "01b81be1df6843ccfe0a71c0699a746bf740dd77",
+      "readmePath": "README.md",
+      "readmeUrl": "https://github.com/juliangarnier/anime/blob/01b81be1df6843ccfe0a71c0699a746bf740dd77/README.md",
+      "rawUrl": "https://raw.githubusercontent.com/juliangarnier/anime/01b81be1df6843ccfe0a71c0699a746bf740dd77/README.md",
+      "readmeSha256": "254b88321537a666b4d37aeb77dba01f630b0da0dc642fb3fec9bbb7bf9ab7fa",
+      "fetchedAt": "2026-11-03T17:10:38.917Z"
+    },
+    {
+      "id": 4,
+      "name": "Motion",
+      "repository": "https://github.com/motiondivision/motion",
+      "defaultBranch": "main",
+      "commit": "7415b6cd14dfdb35d91dfc5b9758994444cc228b",
+      "readmePath": "README.md",
+      "readmeUrl": "https://github.com/motiondivision/motion/blob/7415b6cd14dfdb35d91dfc5b9758994444cc228b/README.md",
+      "rawUrl": "https://raw.githubusercontent.com/motiondivision/motion/7415b6cd14dfdb35d91dfc5b9758994444cc228b/README.md",
+      "readmeSha256": "08915bb5254a4bc1fd47e8d7ea8fff0dcb470461f6fd6b59fb6d2f0bef0400df",
+      "fetchedAt": "2026-11-03T17:10:38.87Z"
+    },
+    {
+      "id": 5,
+      "name": "Manim",
+      "repository": "https://github.com/ManimCommunity/manim",
+      "defaultBranch": "main",
+      "commit": "16ea443e2a5f1d79db0a721161411ce916d6e733",
+      "readmePath": "README.md",
+      "readmeUrl": "https://github.com/ManimCommunity/manim/blob/16ea443e2a5f1d79db0a721161411ce916d6e733/README.md",
+      "rawUrl": "https://raw.githubusercontent.com/ManimCommunity/manim/16ea443e2a5f1d79db0a721161411ce916d6e733/README.md",
+      "readmeSha256": "41cac8aeb33a726c1b0a70d10233ee06d9cd73c6df0bace8145637d75c5fc283",
+      "fetchedAt": "2026-11-03T17:10:40.267Z"
+    },
+    {
+      "id": 6,
+      "name": "Lottie Web",
+      "repository": "https://github.com/airbnb/lottie-web",
+      "defaultBranch": "master",
+      "commit": "bede03d25d232826e0c9dca1733d542d8a7754fb",
+      "readmePath": "README.md",
+      "readmeUrl": "https://github.com/airbnb/lottie-web/blob/bede03d25d232826e0c9dca1733d542d8a7754fb/README.md",
+      "rawUrl": "https://raw.githubusercontent.com/airbnb/lottie-web/bede03d25d232826e0c9dca1733d542d8a7754fb/README.md",
+      "readmeSha256": "c65c2b4ebb100e75b9145d1822019cc5d1d9679a2646b84db266a8719d7696f9",
+      "fetchedAt": "2026-11-03T17:10:40.249Z"
+    },
+    {
+      "id": 7,
+      "name": "MCP for Blender",
+      "repository": "https://github.com/ahujasid/mcp-for-blender",
+      "defaultBranch": "main",
+      "commit": "992233bb258975a05eec8b5691465c50c2831e34",
+      "readmePath": "README.md",
+      "readmeUrl": "https://github.com/ahujasid/mcp-for-blender/blob/992233bb258975a05eec8b5691465c50c2831e34/README.md",
+      "rawUrl": "https://raw.githubusercontent.com/ahujasid/mcp-for-blender/992233bb258975a05eec8b5691465c50c2831e34/README.md",
+      "readmeSha256": "f0c11f3e33c0b29c0ce4dd4cfd69524b97e0173726854d4d84c25bc9ac3ace91",
+      "fetchedAt": "2026-11-03T17:10:40.237Z"
+    },
+    {
+      "id": 8,
+      "name": "Three.js",
+      "repository": "https://github.com/mrdoob/three.js",
+      "defaultBranch": "dev",
+      "commit": "0c09e29fbb06fdd10bb9cf63f198dbe23840c6a2",
+      "readmePath": "README.md",
+      "readmeUrl": "https://github.com/mrdoob/three.js/blob/0c09e29fbb06fdd10bb9cf63f198dbe23840c6a2/README.md",
+      "rawUrl": "https://raw.githubusercontent.com/mrdoob/three.js/0c09e29fbb06fdd10bb9cf63f198dbe23840c6a2/README.md",
+      "readmeSha256": "d553d824625a07d7690de93af6f8daf13d6aaed42700929d7ce4e725fa5ef10d",
+      "fetchedAt": "2026-11-03T17:10:41.155Z"
+    },
+    {
+      "id": 9,
+      "name": "Three GPU Pathtracer",
+      "repository": "https://github.com/gkjohnson/three-gpu-pathtracer",
+      "defaultBranch": "main",
+      "commit": "28cb01edd5bc3e07d918b6e68907bd61ca28f139",
+      "readmePath": "README.md",
+      "readmeUrl": "https://github.com/gkjohnson/three-gpu-pathtracer/blob/28cb01edd5bc3e07d918b6e68907bd61ca28f139/README.md",
+      "rawUrl": "https://raw.githubusercontent.com/gkjohnson/three-gpu-pathtracer/28cb01edd5bc3e07d918b6e68907bd61ca28f139/README.md",
+      "readmeSha256": "866794f39bb4523a33ff73573d8dcc07ec91be843b3cf4950cb00c9c639e6c9f",
+      "fetchedAt": "2026-11-03T17:10:41.611Z",
+      "additionalReadings": [
+        {
+          "sha256": "23063ad1362542056c1e3f5e17bffb9193be5b0f255cc76ac56c0579b2e375d8",
+          "path": "src/webgpu/API.md",
+          "url": "https://github.com/gkjohnson/three-gpu-pathtracer/blob/28cb01edd5bc3e07d918b6e68907bd61ca28f139/src/webgpu/API.md"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "name": "Jolt Physics",
+      "repository": "https://github.com/jrouwe/JoltPhysics",
+      "defaultBranch": "master",
+      "commit": "8bc5cdee81aa896038fe878f163ae6125954876d",
+      "readmePath": "README.md",
+      "readmeUrl": "https://github.com/jrouwe/JoltPhysics/blob/8bc5cdee81aa896038fe878f163ae6125954876d/README.md",
+      "rawUrl": "https://raw.githubusercontent.com/jrouwe/JoltPhysics/8bc5cdee81aa896038fe878f163ae6125954876d/README.md",
+      "readmeSha256": "ad1bc97a1bd81f5f0cda9975684dd175ddb22b721dd34d5d26f42443e5fe859d",
+      "fetchedAt": "2026-11-03T17:10:41.733Z"
+    },
+    {
+      "id": 11,
+      "name": "postprocessing",
+      "repository": "https://github.com/pmndrs/postprocessing",
+      "defaultBranch": "main",
+      "commit": "a1f103559d15cf56cbcbb15d4373711b09418f3f",
+      "readmePath": "README.md",
+      "readmeUrl": "https://github.com/pmndrs/postprocessing/blob/a1f103559d15cf56cbcbb15d4373711b09418f3f/README.md",
+      "rawUrl": "https://raw.githubusercontent.com/pmndrs/postprocessing/a1f103559d15cf56cbcbb15d4373711b09418f3f/README.md",
+      "readmeSha256": "60c29babcde00d7cd6052f2e4d7cfbb276ece8f761358928bc04420b9b4fee21",
+      "fetchedAt": "2026-11-03T17:10:41.764Z",
+      "additionalReadings": [
+        {
+          "sha256": "6492e29dc0f880d824d93042f1d115055024fa72e3652e6f33c6665cf6a5123a",
+          "path": "src/core/EffectComposer.js",
+          "url": "https://github.com/pmndrs/postprocessing/blob/a1f103559d15cf56cbcbb15d4373711b09418f3f/src/core/EffectComposer.js"
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "name": "Three.quarks",
+      "repository": "https://github.com/Alchemist0823/three.quarks",
+      "defaultBranch": "master",
+      "commit": "de7c207f791c8b2260c43334a282976221688b1b",
+      "readmePath": "README.md",
+      "readmeUrl": "https://github.com/Alchemist0823/three.quarks/blob/de7c207f791c8b2260c43334a282976221688b1b/README.md",
+      "rawUrl": "https://raw.githubusercontent.com/Alchemist0823/three.quarks/de7c207f791c8b2260c43334a282976221688b1b/README.md",
+      "readmeSha256": "bc051433407c1f60fe16cd17f499c175f44a756ad0406cf05077e5507ae64244",
+      "fetchedAt": "2026-11-03T17:10:42.785Z"
+    },
+    {
+      "id": 13,
+      "name": "Tweakpane",
+      "repository": "https://github.com/cocopon/tweakpane",
+      "defaultBranch": "main",
+      "commit": "50a18c3dba67cb78431d7248dbe4d5a76336885a",
+      "readmePath": "README.md",
+      "readmeUrl": "https://github.com/cocopon/tweakpane/blob/50a18c3dba67cb78431d7248dbe4d5a76336885a/README.md",
+      "rawUrl": "https://raw.githubusercontent.com/cocopon/tweakpane/50a18c3dba67cb78431d7248dbe4d5a76336885a/README.md",
+      "readmeSha256": "f46311d71e3771c16a7561e863de12ff92cacd51b8adebe933c0583b6e86e8b9",
+      "fetchedAt": "2026-11-03T17:10:43.103Z"
+    },
+    {
+      "id": 14,
+      "name": "ComfyUI",
+      "repository": "https://github.com/Comfy-Org/ComfyUI",
+      "defaultBranch": "master",
+      "commit": "576b642e77b4c42f84afe583c8e8f0eef7637618",
+      "readmePath": "README.md",
+      "readmeUrl": "https://github.com/Comfy-Org/ComfyUI/blob/576b642e77b4c42f84afe583c8e8f0eef7637618/README.md",
+      "rawUrl": "https://raw.githubusercontent.com/Comfy-Org/ComfyUI/576b642e77b4c42f84afe583c8e8f0eef7637618/README.md",
+      "readmeSha256": "1f5452375de6170925930393ade6380f73a01974d00c7e784d1521a86e5b388a",
+      "fetchedAt": "2026-11-03T17:10:43.514Z",
+      "additionalReadings": [
+        {
+          "sha256": "8bf77cd877f989445ca317efab08ae72c36071a2839bf1f0fc992e5907b005ec",
+          "path": "script_examples/basic_api_example.py",
+          "url": "https://github.com/Comfy-Org/ComfyUI/blob/576b642e77b4c42f84afe583c8e8f0eef7637618/script_examples/basic_api_example.py"
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "name": "CosyVoice",
+      "repository": "https://github.com/QwenAudio/CosyVoice",
+      "defaultBranch": "main",
+      "commit": "074ca6dc9e80a2f424f1f74b48bdd7d3fea531cc",
+      "readmePath": "README.md",
+      "readmeUrl": "https://github.com/QwenAudio/CosyVoice/blob/074ca6dc9e80a2f424f1f74b48bdd7d3fea531cc/README.md",
+      "rawUrl": "https://raw.githubusercontent.com/QwenAudio/CosyVoice/074ca6dc9e80a2f424f1f74b48bdd7d3fea531cc/README.md",
+      "readmeSha256": "66436370172c2830ed98aa643b31898c65e16eee14ade68f00828d21fae602e0",
+      "fetchedAt": "2026-11-03T17:10:43.182Z"
+    },
+    {
+      "id": 16,
+      "name": "librosa",
+      "repository": "https://github.com/librosa/librosa",
+      "defaultBranch": "main",
+      "commit": "4ffed287f9044654cc4a1a7393f895cd716a0a5d",
+      "readmePath": "README.md",
+      "readmeUrl": "https://github.com/librosa/librosa/blob/4ffed287f9044654cc4a1a7393f895cd716a0a5d/README.md",
+      "rawUrl": "https://raw.githubusercontent.com/librosa/librosa/4ffed287f9044654cc4a1a7393f895cd716a0a5d/README.md",
+      "readmeSha256": "5887811bcf8720e315cebfcc7ebe62637cc284bf005077dc1a0340a8b97e3b36",
+      "fetchedAt": "2026-11-03T17:10:44.352Z",
+      "additionalReadings": [
+        {
+          "sha256": "f1f972e87b187d4c02598c28975c7e724528e23011202567ac38f3edf6de088b",
+          "path": "librosa/beat.py",
+          "url": "https://github.com/librosa/librosa/blob/4ffed287f9044654cc4a1a7393f895cd716a0a5d/librosa/beat.py"
+        }
+      ]
+    },
+    {
+      "id": 17,
+      "name": "WhisperX",
+      "repository": "https://github.com/m-bain/whisperX",
+      "defaultBranch": "main",
+      "commit": "5d3678b8535698a2826a5db9eb3e4105aef85dd9",
+      "readmePath": "README.md",
+      "readmeUrl": "https://github.com/m-bain/whisperX/blob/5d3678b8535698a2826a5db9eb3e4105aef85dd9/README.md",
+      "rawUrl": "https://raw.githubusercontent.com/m-bain/whisperX/5d3678b8535698a2826a5db9eb3e4105aef85dd9/README.md",
+      "readmeSha256": "98ebee691ebee0ca5bdd9257dad72e1e74a9c216ff3adb7fa68d5164007a84ea",
+      "fetchedAt": "2026-11-03T17:10:44.499Z",
+      "additionalReadings": [
+        {
+          "sha256": "df1e565ebe9e039c9c32f2fafff427ee1b7107bdb45699f0fe636163a62957f2",
+          "path": "whisperx/alignment.py",
+          "url": "https://github.com/m-bain/whisperX/blob/5d3678b8535698a2826a5db9eb3e4105aef85dd9/whisperx/alignment.py"
+        }
+      ]
+    },
+    {
+      "id": 18,
+      "name": "OBS Studio",
+      "repository": "https://github.com/obsproject/obs-studio",
+      "defaultBranch": "master",
+      "commit": "7a25c3fd8b5eb87c2d2e0606cae36e32014bc6fa",
+      "readmePath": "README.rst",
+      "readmeUrl": "https://github.com/obsproject/obs-studio/blob/7a25c3fd8b5eb87c2d2e0606cae36e32014bc6fa/README.rst",
+      "rawUrl": "https://raw.githubusercontent.com/obsproject/obs-studio/7a25c3fd8b5eb87c2d2e0606cae36e32014bc6fa/README.rst",
+      "readmeSha256": "be2dff0124620dcd9d8d83ef9084b12d1e61e896d3295232501cb3ebd3f6a318",
+      "fetchedAt": "2026-11-03T17:10:44.949Z"
+    },
+    {
+      "id": 19,
+      "name": "LosslessCut",
+      "repository": "https://github.com/mifi/lossless-cut",
+      "defaultBranch": "master",
+      "commit": "4c7ab1cb0c9acaefabb48e997bc909562dc3624d",
+      "readmePath": "README.md",
+      "readmeUrl": "https://github.com/mifi/lossless-cut/blob/4c7ab1cb0c9acaefabb48e997bc909562dc3624d/README.md",
+      "rawUrl": "https://raw.githubusercontent.com/mifi/lossless-cut/4c7ab1cb0c9acaefabb48e997bc909562dc3624d/README.md",
+      "readmeSha256": "82bd6e32584f6ec3e64f3480064daad8d3387be8acd106bb7c1ea98fbe231f9e",
+      "fetchedAt": "2026-11-03T17:10:44.904Z"
+    },
+    {
+      "id": 20,
+      "name": "FFmpeg",
+      "repository": "https://github.com/FFmpeg/FFmpeg",
+      "defaultBranch": "master",
+      "commit": "c6a68b6e453546dbc5afeabf7f7a1dec8ef3f1dd",
+      "readmePath": "README.md",
+      "readmeUrl": "https://github.com/FFmpeg/FFmpeg/blob/c6a68b6e453546dbc5afeabf7f7a1dec8ef3f1dd/README.md",
+      "rawUrl": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/c6a68b6e453546dbc5afeabf7f7a1dec8ef3f1dd/README.md",
+      "readmeSha256": "86474c8f0806772f831a9c7a4982fd2398507372c577d229b76f60bbb3e7dead",
+      "fetchedAt": "2026-11-03T17:10:45.73Z"
+    }
+  ],
+  "officialDocuments": [
+    {
+      "title": "Remotion core idea",
+      "url": "https://www.remotion.dev/docs/idea",
+      "access": "readable_page",
+      "checkedOn": "2026-11-04"
+    },
+    {
+      "title": "Remotion license and pricing",
+      "url": "https://www.remotion.dev/docs/license/pricing",
+      "access": "readable_page",
+      "checkedOn": "2026-11-04"
+    },
+    {
+      "title": "Anime.js React",
+      "url": "https://animejs.com/documentation/getting-started/using-with-react/",
+      "access": "readable_page",
+      "checkedOn": "2026-11-04"
+    },
+    {
+      "title": "Anime.js timeline",
+      "url": "https://animejs.com/documentation/timeline/",
+      "access": "readable_page",
+      "checkedOn": "2026-11-04"
+    },
+    {
+      "title": "Motion animation",
+      "url": "https://motion.dev/docs/react-animation",
+      "access": "readable_page",
+      "checkedOn": "2026-11-04"
+    },
+    {
+      "title": "Motion layout",
+      "url": "https://motion.dev/docs/react-layout-animations",
+      "access": "readable_page",
+      "checkedOn": "2026-11-04"
+    },
+    {
+      "title": "Motion accessibility",
+      "url": "https://motion.dev/docs/react-accessibility",
+      "access": "readable_page",
+      "checkedOn": "2026-11-04"
+    },
+    {
+      "title": "Manim quickstart",
+      "url": "https://docs.manim.community/en/stable/tutorials/quickstart.html",
+      "access": "readable_page",
+      "checkedOn": "2026-11-04"
+    },
+    {
+      "title": "Three.js cleanup",
+      "url": "https://threejs.org/manual/pages/cleanup.html",
+      "access": "readable_page",
+      "checkedOn": "2026-11-04"
+    },
+    {
+      "title": "Jolt JavaScript binding README",
+      "url": "https://github.com/jrouwe/JoltPhysics.js",
+      "access": "readable_page",
+      "checkedOn": "2026-11-04"
+    },
+    {
+      "title": "Tweakpane bindings",
+      "url": "https://tweakpane.github.io/docs/input-bindings/",
+      "access": "readable_page",
+      "checkedOn": "2026-11-04"
+    },
+    {
+      "title": "ComfyUI server routes",
+      "url": "https://docs.comfy.org/development/comfyui-server/comms_routes",
+      "access": "readable_page",
+      "checkedOn": "2026-11-04"
+    },
+    {
+      "title": "CosyVoice 3 model card",
+      "url": "https://huggingface.co/FunAudioLLM/Fun-CosyVoice3-0.5B-2512",
+      "access": "readable_page",
+      "checkedOn": "2026-11-04"
+    },
+    {
+      "title": "librosa beat source documentation",
+      "url": "https://librosa.org/doc/latest/_modules/librosa/beat.html",
+      "access": "readable_page",
+      "checkedOn": "2026-11-04"
+    },
+    {
+      "title": "librosa rhythm tutorial",
+      "url": "https://librosa.org/doc/latest/auto_tutorials/01-intro/06-rhythm.html",
+      "access": "search_excerpt",
+      "checkedOn": "2026-11-04"
+    },
+    {
+      "title": "OBS formats guide",
+      "url": "https://obsproject.com/kb/audio-video-formats-guide",
+      "access": "search_excerpt",
+      "checkedOn": "2026-11-04"
+    },
+    {
+      "title": "OBS recording guide",
+      "url": "https://obsproject.com/kb/standard-recording-output-guide",
+      "access": "search_excerpt",
+      "checkedOn": "2026-11-04"
+    },
+    {
+      "title": "LosslessCut limitations",
+      "url": "https://losslesscut.app/docs/troubleshooting",
+      "access": "search_excerpt",
+      "checkedOn": "2026-11-04"
+    },
+    {
+      "title": "FFmpeg CLI documentation",
+      "url": "https://www.ffmpeg.org/ffmpeg.html",
+      "access": "search_excerpt",
+      "checkedOn": "2026-11-04"
+    },
+    {
+      "title": "FFmpeg complete documentation",
+      "url": "https://www.ffmpeg.org/ffmpeg-all.html",
+      "access": "search_excerpt",
+      "checkedOn": "2026-11-04"
+    }
+  ],
+  "accessNotes": [
+    "Shortened t.co links were not all resolved. Repositories were identified by project name and owner; no assertion of verified redirects for all short links.",
+    "Lottie means lottie-web for this web project. MCP for Blender is ahujasid/mcp-for-blender, formerly blender-mcp.",
+    "README and six selected code/API files were fetched at the exact commits below; checksums describe local downloaded UTF-8 content. These files were not executed.",
+    "The upstream development HEAD may differ from the currently published npm/PyPI package or a stable release.",
+    "Some official documents were only accessible as search excerpts; access fields distinguish this from a directly readable page.",
+    "ffprobe documentation fetch timed out; the linked reference is for future lookup, not claimed as read. Lottie documentation site redirected to a page without readable text; notes use the upstream README.",
+    "Raw downloads are a local ignored research cache under .local/research; the committed knowledge base contains summaries, links, and provenance metadata, not copies of entire upstream repositories."
+  ]
+}

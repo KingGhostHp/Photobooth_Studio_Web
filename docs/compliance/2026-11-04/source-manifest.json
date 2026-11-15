@@ -1,0 +1,106 @@
+{
+  "date": "2026-11-04",
+  "scannerCommit": "3a8617dfdec8ac6e125146ae71614e5caa40aeab",
+  "files": [
+    {
+      "path": "backend/package.json",
+      "sha256": "5708ce5c5c1f8881d0dbef2e8176d0c9ad540a795c68089c307fff5316df0ecd"
+    },
+    {
+      "path": "backend/src/db.js",
+      "sha256": "b76a71838df2a893607d2d2e296a0cf98a269a7411a340be5735ec097f729584"
+    },
+    {
+      "path": "backend/src/server.js",
+      "sha256": "21561d442eca1883ea4ffdd3c418ea0986eba03abcdd48003049cae3d5e70d65"
+    },
+    {
+      "path": "backend/src/studio/analytics.js",
+      "sha256": "91883619ce5c10a39760e3a50450a21d8227fecb84e69a36ee5aee26c9541a24"
+    },
+    {
+      "path": "backend/src/studio/auth.js",
+      "sha256": "7a24ef2a06a46e3a258a1d6fd0a7461e8849e22528f9f1098e52941a8f27bdb6"
+    },
+    {
+      "path": "backend/src/studio/costumes.js",
+      "sha256": "52501ea30531967fbc1648821246be40dad6ac29e659caa19c061bde31e6dda4"
+    },
+    {
+      "path": "backend/src/studio/domain.js",
+      "sha256": "661e6a868d4748d55a4ec461caf46f9971239a5a52a8f3624a329462580d218f"
+    },
+    {
+      "path": "backend/src/studio/index.js",
+      "sha256": "8abc554a78d7b75f70d2e65a86fd0dc1d3ab3d87faf5dd7299d13d26964c9e50"
+    },
+    {
+      "path": "frontend/index.html",
+      "sha256": "e0b87024dafe9d211648e9924c48e05426af6e0aa8fca40ce7385e9a250596f5"
+    },
+    {
+      "path": "frontend/package.json",
+      "sha256": "18da29f98c11e30f7ef3fe35236e8c6a910be2f5b85ebd8164bd0b66604a976f"
+    },
+    {
+      "path": "frontend/src/App.jsx",
+      "sha256": "fea681bae74ad839f66e739211252fb8b65fe473353927b19170c43e70fe199b"
+    },
+    {
+      "path": "frontend/src/main.jsx",
+      "sha256": "2ae75dbac62753028074230429124308fd2e7c62c43eba3c05101e82e0a8ec19"
+    },
+    {
+      "path": "frontend/src/studio/admin.css",
+      "sha256": "a91fad74a9261357c1b98961d08df0a0a0c7ea95aa78b030f122c7b920cc9007"
+    },
+    {
+      "path": "frontend/src/studio/Admin.jsx",
+      "sha256": "d0b7fd71f4f6fd9bd36e0e3e37570c25d440e869736e0ce4df94ca84501da28f"
+    },
+    {
+      "path": "frontend/src/studio/api.js",
+      "sha256": "b34c1bd752857c3b3b786765d28dbd0dc7e1663bb24d7c79ca154c3cc4d9231c"
+    },
+    {
+      "path": "frontend/src/studio/Calendar.jsx",
+      "sha256": "1b966a3c76e2c13ed4c2045f3440b3fb5d654cdc3033bcb0e9f7e941fa594fbf"
+    },
+    {
+      "path": "frontend/src/studio/Checkout.jsx",
+      "sha256": "82d73da3a008a537f092d75c984a81a223719408a22b29357e97252a3be4fd16"
+    },
+    {
+      "path": "frontend/src/studio/date-utils.js",
+      "sha256": "23b8509b93310b808887bcf20524c31f86e4cdc91ebb6818f93e5327f117626c"
+    },
+    {
+      "path": "frontend/src/studio/DatePicker.jsx",
+      "sha256": "f33069a1ffaec6903558dfbbd696f43021a08939a00e2ec8775518345abfc378"
+    },
+    {
+      "path": "frontend/src/studio/Dropdown.jsx",
+      "sha256": "957b51f16a79899d65d0199eb47d63f43d36726538a5ac59f4f88a16c15251de"
+    },
+    {
+      "path": "frontend/src/studio/Lookup.jsx",
+      "sha256": "5fb6dbc41ff00c34e415096a1b08f222ea88150dd49501e4a95937bd1cee5547"
+    },
+    {
+      "path": "frontend/src/studio/ProductGallery.jsx",
+      "sha256": "6f354a36c8d90a828a7fcdeefe987314f9db1502c40aa1d3c8a3068369770b2c"
+    },
+    {
+      "path": "frontend/src/studio/Storefront.jsx",
+      "sha256": "86ffe9c14c927867d8ae7b7d5868e1dca410f1377e3f9bd7b7e55576cbc17a69"
+    },
+    {
+      "path": "frontend/src/studio/studio.css",
+      "sha256": "33c36ef4f01db076b33928ba76972e260fe88f066f7d8eb5794eecb312dfb7b3"
+    },
+    {
+      "path": "frontend/src/studio/UI.jsx",
+      "sha256": "0a151177a5ac2c98c6941a3419c9dd2abedca5e9c1670732491bbb53fd023e57"
+    }
+  ]
+}

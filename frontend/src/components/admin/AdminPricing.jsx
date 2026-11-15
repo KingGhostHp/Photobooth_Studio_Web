@@ -1,53 +1,65 @@
-import React, { useState, useEffect } from 'react';
-import { Tag, Edit2, Plus, Trash2, Check, RefreshCw, Sparkles, Camera, Sparkle, Film, ShieldCheck, DollarSign, X, Upload, Image as ImageIcon } from 'lucide-react';
+import { adminFetch } from "../../studio/api";
+import React, { useState, useEffect } from "react";
+import {
+  Tag,
+  Edit2,
+  Plus,
+  Trash2,
+  Check,
+  Camera,
+  Film,
+  X,
+  Upload,
+  Image as ImageIcon,
+} from "lucide-react";
 
-export default function AdminPricing() {
-  const [activeSubTab, setActiveSubTab] = useState('packages'); // 'packages' | 'addons' | 'photobooth'
+export default function AdminPricing({ refreshKey = 0 }) {
+  const [activeSubTab, setActiveSubTab] = useState("packages"); // 'packages' | 'addons' | 'photobooth'
   const [packages, setPackages] = useState([]);
   const [addons, setAddons] = useState([]);
   const [photobooth, setPhotobooth] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
   const [statusMessage, setStatusMessage] = useState(null);
 
   // Modals state
   const [showPkgModal, setShowPkgModal] = useState(false);
   const [editingPkg, setEditingPkg] = useState(null);
   const [pkgForm, setPkgForm] = useState({
-    code: 'PKG-NEW',
-    name: '',
-    subtitle: '',
+    code: "PKG-NEW",
+    name: "",
+    subtitle: "",
     basePricePerPerson: 1000000,
     deposit: 300000,
     includedPeople: 1,
     outfitsCount: 2,
     retouchedCount: 10,
-    image: '/images/costume_ao_dai_viet_1786199756012.png',
-    featuresText: 'Bao gồm 2 bộ trang phục cao cấp\nTrang điểm & Làm tóc chuyên nghiệp\nBàn giao toàn bộ file gốc',
-    isPopular: false
+    image: "/images/costume_ao_dai_viet_1786199756012.png",
+    featuresText:
+      "Bao gồm 2 bộ trang phục cao cấp\nTrang điểm & Làm tóc chuyên nghiệp\nBàn giao toàn bộ file gốc",
+    isPopular: false,
   });
 
   const [showAddonModal, setShowAddonModal] = useState(false);
   const [editingAddon, setEditingAddon] = useState(null);
-  const [addonForm, setAddonForm] = useState({ name: '', price: 200000 });
+  const [addonForm, setAddonForm] = useState({ name: "", price: 200000 });
 
   const [showPbModal, setShowPbModal] = useState(false);
   const [editingPb, setEditingPb] = useState(null);
   const [pbForm, setPbForm] = useState({
-    code: 'PB-NEW',
-    name: '',
-    description: '',
+    code: "PB-NEW",
+    name: "",
+    description: "",
     price: 70000,
-    image: ''
+    image: "",
   });
 
   // Fetch data
   const fetchData = async () => {
-    setLoading(true);
     try {
       const [resPkg, resAddon, resPb] = await Promise.all([
-        fetch('/api/packages'),
-        fetch('/api/addons'),
-        fetch('/api/photobooth')
+        adminFetch("/api/packages"),
+        adminFetch("/api/addons"),
+        adminFetch("/api/photobooth"),
       ]);
       const dataPkg = await resPkg.json();
       const dataAddon = await resAddon.json();
@@ -57,36 +69,38 @@ export default function AdminPricing() {
       if (dataAddon.success) setAddons(dataAddon.data);
       if (dataPb.success) setPhotobooth(dataPb.data);
     } catch (err) {
-      console.error('Error fetching pricing data:', err);
-    } finally {
-      setLoading(false);
+      setLoadError(err.message);
     }
   };
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [refreshKey]);
 
   // Format currency
   const formatVND = (amount) => {
-    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount || 0);
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(amount || 0);
   };
 
   /* ==================== 1. PACKAGES HANDLERS ==================== */
   const handleOpenPkgAdd = () => {
     setEditingPkg(null);
     setPkgForm({
-      code: 'PKG-CUSTOM',
-      name: 'Gói Chụp Concept Mới 2026',
-      subtitle: 'Phong cách độc bản & ấn tượng',
+      code: "PKG-CUSTOM",
+      name: "Gói Chụp Concept Mới 2026",
+      subtitle: "Phong cách độc bản & ấn tượng",
       basePricePerPerson: 1200000,
       deposit: 400000,
       includedPeople: 1,
       outfitsCount: 2,
       retouchedCount: 12,
-      image: '/images/costume_ao_dai_viet_1786199756012.png',
-      featuresText: 'Bao gồm 2 bộ trang phục tự chọn\nMakeup & Làm tóc cao cấp\nBàn giao toàn bộ file ảnh gốc HD',
-      isPopular: false
+      image: "/images/costume_ao_dai_viet_1786199756012.png",
+      featuresText:
+        "Bao gồm 2 bộ trang phục tự chọn\nMakeup & Làm tóc cao cấp\nBàn giao toàn bộ file ảnh gốc HD",
+      isPopular: false,
     });
     setShowPkgModal(true);
   };
@@ -94,78 +108,87 @@ export default function AdminPricing() {
   const handleOpenPkgEdit = (pkg) => {
     setEditingPkg(pkg);
     setPkgForm({
-      code: pkg.code || '',
-      name: pkg.name || '',
-      subtitle: pkg.subtitle || '',
+      code: pkg.code || "",
+      name: pkg.name || "",
+      subtitle: pkg.subtitle || "",
       basePricePerPerson: pkg.basePricePerPerson || 0,
       deposit: pkg.deposit || 0,
       includedPeople: pkg.includedPeople || 1,
       outfitsCount: pkg.outfitsCount || 1,
       retouchedCount: pkg.retouchedCount || 10,
-      image: pkg.image || '',
-      featuresText: Array.isArray(pkg.features) ? pkg.features.join('\n') : '',
-      isPopular: !!pkg.isPopular
+      image: pkg.image || "",
+      featuresText: Array.isArray(pkg.features) ? pkg.features.join("\n") : "",
+      isPopular: !!pkg.isPopular,
     });
     setShowPkgModal(true);
   };
 
   const handleSavePkg = async (e) => {
     e.preventDefault();
-    const features = pkgForm.featuresText.split('\n').filter(line => line.trim().length > 0);
+    const features = pkgForm.featuresText
+      .split("\n")
+      .filter((line) => line.trim().length > 0);
     const body = {
       ...pkgForm,
-      features
+      features,
     };
 
     try {
       let res;
       if (editingPkg) {
-        res = await fetch(`/api/packages/${editingPkg.id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body)
+        res = await adminFetch(`/api/packages/${editingPkg.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
         });
       } else {
-        res = await fetch('/api/packages', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body)
+        res = await adminFetch("/api/packages", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
         });
       }
 
       const data = await res.json();
       if (data.success) {
-        setStatusMessage(editingPkg ? 'Cập nhật giá gói chụp thành công!' : 'Thêm gói chụp mới thành công!');
+        setStatusMessage(
+          editingPkg
+            ? "Cập nhật giá gói chụp thành công!"
+            : "Thêm gói chụp mới thành công!",
+        );
         setTimeout(() => setStatusMessage(null), 3000);
         setShowPkgModal(false);
         fetchData();
       } else {
-        alert('Lỗi: ' + data.error);
+        alert("Lỗi: " + data.error);
       }
     } catch (err) {
-      alert('Lỗi kết nối: ' + err.message);
+      alert("Lỗi kết nối: " + err.message);
     }
   };
 
   const handleDeletePkg = async (id) => {
-    if (!window.confirm('Bạn có chắc chắn muốn xóa Gói chụp này?')) return;
+    if (!window.confirm("Bạn có chắc chắn muốn xóa Gói chụp này?")) return;
     try {
-      const res = await fetch(`/api/packages/${id}`, { method: 'DELETE' });
+      const res = await adminFetch(`/api/packages/${id}`, { method: "DELETE" });
       const data = await res.json();
       if (data.success) {
-        setStatusMessage('Đã xóa gói chụp khỏi hệ thống!');
+        setStatusMessage("Đã xóa gói chụp khỏi hệ thống!");
         setTimeout(() => setStatusMessage(null), 3000);
         fetchData();
       }
     } catch (err) {
-      alert('Lỗi xóa gói chụp: ' + err.message);
+      alert("Lỗi xóa gói chụp: " + err.message);
     }
   };
 
   /* ==================== 2. ADDONS HANDLERS ==================== */
   const handleOpenAddonAdd = () => {
     setEditingAddon(null);
-    setAddonForm({ name: 'Dịch vụ chụp thêm góc cận nghệ thuật', price: 300000 });
+    setAddonForm({
+      name: "Dịch vụ chụp thêm góc cận nghệ thuật",
+      price: 300000,
+    });
     setShowAddonModal(true);
   };
 
@@ -180,43 +203,44 @@ export default function AdminPricing() {
     try {
       let res;
       if (editingAddon) {
-        res = await fetch(`/api/addons/${editingAddon.id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(addonForm)
+        res = await adminFetch(`/api/addons/${editingAddon.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(addonForm),
         });
       } else {
-        res = await fetch('/api/addons', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(addonForm)
+        res = await adminFetch("/api/addons", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(addonForm),
         });
       }
 
       const data = await res.json();
       if (data.success) {
-        setStatusMessage('Cập nhật bảng giá phụ phí thành công!');
+        setStatusMessage("Cập nhật bảng giá phụ phí thành công!");
         setTimeout(() => setStatusMessage(null), 3000);
         setShowAddonModal(false);
         fetchData();
       }
     } catch (err) {
-      alert('Lỗi: ' + err.message);
+      alert("Lỗi: " + err.message);
     }
   };
 
   const handleDeleteAddon = async (id) => {
-    if (!window.confirm('Bạn có chắc chắn muốn xóa dịch vụ phụ phí này?')) return;
+    if (!window.confirm("Bạn có chắc chắn muốn xóa dịch vụ phụ phí này?"))
+      return;
     try {
-      const res = await fetch(`/api/addons/${id}`, { method: 'DELETE' });
+      const res = await adminFetch(`/api/addons/${id}`, { method: "DELETE" });
       const data = await res.json();
       if (data.success) {
-        setStatusMessage('Đã xóa dịch vụ phụ phí!');
+        setStatusMessage("Đã xóa dịch vụ phụ phí!");
         setTimeout(() => setStatusMessage(null), 3000);
         fetchData();
       }
     } catch (err) {
-      alert('Lỗi xóa: ' + err.message);
+      alert("Lỗi xóa: " + err.message);
     }
   };
 
@@ -226,7 +250,7 @@ export default function AdminPricing() {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setPbForm(prev => ({ ...prev, image: reader.result }));
+        setPbForm((prev) => ({ ...prev, image: reader.result }));
       };
       reader.readAsDataURL(file);
     }
@@ -235,11 +259,12 @@ export default function AdminPricing() {
   const handleOpenPbAdd = () => {
     setEditingPb(null);
     setPbForm({
-      code: 'PB-Y2K-04',
-      name: 'Khung In Dải Ảnh Vintage 6-Cut',
-      description: 'Chụp dải ảnh 6 ô độc đáo viền hologram lấp lánh',
+      code: "PB-Y2K-04",
+      name: "Khung In Dải Ảnh Vintage 6-Cut",
+      description: "Chụp dải ảnh 6 ô độc đáo viền hologram lấp lánh",
       price: 90000,
-      image: 'https://images.unsplash.com/photo-1527529482837-4698179dc6ce?auto=format&fit=crop&w=800&q=80'
+      image:
+        "https://images.unsplash.com/photo-1527529482837-4698179dc6ce?auto=format&fit=crop&w=800&q=80",
     });
     setShowPbModal(true);
   };
@@ -247,11 +272,11 @@ export default function AdminPricing() {
   const handleOpenPbEdit = (pb) => {
     setEditingPb(pb);
     setPbForm({
-      code: pb.code || '',
-      name: pb.name || '',
-      description: pb.description || '',
+      code: pb.code || "",
+      name: pb.name || "",
+      description: pb.description || "",
       price: pb.price || 0,
-      image: pb.image || ''
+      image: pb.image || "",
     });
     setShowPbModal(true);
   };
@@ -261,73 +286,56 @@ export default function AdminPricing() {
     try {
       let res;
       if (editingPb) {
-        res = await fetch(`/api/photobooth/${editingPb.id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(pbForm)
+        res = await adminFetch(`/api/photobooth/${editingPb.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(pbForm),
         });
       } else {
-        res = await fetch('/api/photobooth', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(pbForm)
+        res = await adminFetch("/api/photobooth", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(pbForm),
         });
       }
 
       const data = await res.json();
       if (data.success) {
-        setStatusMessage('Cập nhật bảng giá Photobooth thành công!');
+        setStatusMessage("Cập nhật bảng giá Photobooth thành công!");
         setTimeout(() => setStatusMessage(null), 3000);
         setShowPbModal(false);
         fetchData();
       }
     } catch (err) {
-      alert('Lỗi: ' + err.message);
+      alert("Lỗi: " + err.message);
     }
   };
 
   const handleDeletePb = async (id) => {
-    if (!window.confirm('Bạn có chắc chắn muốn xóa khung ảnh Photobooth này?')) return;
+    if (!window.confirm("Bạn có chắc chắn muốn xóa khung ảnh Photobooth này?"))
+      return;
     try {
-      const res = await fetch(`/api/photobooth/${id}`, { method: 'DELETE' });
+      const res = await adminFetch(`/api/photobooth/${id}`, {
+        method: "DELETE",
+      });
       const data = await res.json();
       if (data.success) {
-        setStatusMessage('Đã xóa khung ảnh Photobooth!');
+        setStatusMessage("Đã xóa khung ảnh Photobooth!");
         setTimeout(() => setStatusMessage(null), 3000);
         fetchData();
       }
     } catch (err) {
-      alert('Lỗi xóa: ' + err.message);
+      alert("Lỗi xóa: " + err.message);
     }
   };
 
   return (
     <div className="space-y-6">
-      {/* Header Bar */}
-      <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <h2 className="text-xl font-bold font-serif-title text-slate-900">Quản Lý Bảng Giá & Các Gói Dịch Vụ</h2>
-            <span className="bg-amber-100 text-amber-800 text-xs font-black px-2.5 py-0.5 rounded-full border border-amber-200">
-              Pricing CMS
-            </span>
-          </div>
-          <p className="text-xs text-slate-500 mt-1">
-            Điều chỉnh giá các Gói chụp ảnh Concept, Dịch vụ phụ phí đi kèm và Bảng giá khung ảnh Photobooth.
-          </p>
+      {loadError && (
+        <div className="error-state" role="alert">
+          {loadError}
         </div>
-
-        <div className="flex items-center gap-3">
-          <button
-            onClick={fetchData}
-            className="p-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors"
-            title="Làm mới dữ liệu"
-          >
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-          </button>
-        </div>
-      </div>
-
+      )}
       {/* Success Notification */}
       {statusMessage && (
         <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold px-4 py-3 rounded-2xl flex items-center gap-2 shadow-sm">
@@ -339,11 +347,11 @@ export default function AdminPricing() {
       {/* Sub Tabs Selection */}
       <div className="flex flex-wrap items-center gap-2 bg-slate-100 p-1.5 rounded-2xl border border-slate-200 max-w-xl">
         <button
-          onClick={() => setActiveSubTab('packages')}
+          onClick={() => setActiveSubTab("packages")}
           className={`flex-1 py-2.5 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
-            activeSubTab === 'packages'
-              ? 'bg-white text-amber-800 shadow-sm border border-amber-200'
-              : 'text-slate-600 hover:text-slate-900'
+            activeSubTab === "packages"
+              ? "bg-white text-amber-800 shadow-sm border border-amber-200"
+              : "text-slate-600 hover:text-slate-900"
           }`}
         >
           <Camera className="w-4 h-4 text-amber-600" />
@@ -351,11 +359,11 @@ export default function AdminPricing() {
         </button>
 
         <button
-          onClick={() => setActiveSubTab('addons')}
+          onClick={() => setActiveSubTab("addons")}
           className={`flex-1 py-2.5 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
-            activeSubTab === 'addons'
-              ? 'bg-white text-amber-800 shadow-sm border border-amber-200'
-              : 'text-slate-600 hover:text-slate-900'
+            activeSubTab === "addons"
+              ? "bg-white text-amber-800 shadow-sm border border-amber-200"
+              : "text-slate-600 hover:text-slate-900"
           }`}
         >
           <Tag className="w-4 h-4 text-amber-600" />
@@ -363,11 +371,11 @@ export default function AdminPricing() {
         </button>
 
         <button
-          onClick={() => setActiveSubTab('photobooth')}
+          onClick={() => setActiveSubTab("photobooth")}
           className={`flex-1 py-2.5 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
-            activeSubTab === 'photobooth'
-              ? 'bg-white text-amber-800 shadow-sm border border-amber-200'
-              : 'text-slate-600 hover:text-slate-900'
+            activeSubTab === "photobooth"
+              ? "bg-white text-amber-800 shadow-sm border border-amber-200"
+              : "text-slate-600 hover:text-slate-900"
           }`}
         >
           <Film className="w-4 h-4 text-amber-600" />
@@ -376,10 +384,12 @@ export default function AdminPricing() {
       </div>
 
       {/* TAB 1: SERVICE PACKAGES */}
-      {activeSubTab === 'packages' && (
+      {activeSubTab === "packages" && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Danh Sách Bảng Giá Gói Chụp Ảnh</h3>
+            <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider">
+              Danh Sách Bảng Giá Gói Chụp Ảnh
+            </h3>
             <button
               onClick={handleOpenPkgAdd}
               className="btn-gold px-4 py-2 text-xs font-extrabold flex items-center gap-2 shadow-sm"
@@ -391,10 +401,17 @@ export default function AdminPricing() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {packages.map((pkg) => (
-              <div key={pkg.id} className="bg-white rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition-all overflow-hidden flex flex-col justify-between">
+              <div
+                key={pkg.id}
+                className="bg-white rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition-all overflow-hidden flex flex-col justify-between"
+              >
                 <div>
                   <div className="relative aspect-[16/9] bg-slate-900 overflow-hidden">
-                    <img src={pkg.image} alt={pkg.name} className="w-full h-full object-cover" />
+                    <img
+                      src={pkg.image}
+                      alt={pkg.name}
+                      className="w-full h-full object-cover"
+                    />
                     <div className="absolute top-3 left-3 bg-amber-500 text-slate-950 font-black text-[10px] px-2.5 py-0.5 rounded-full shadow">
                       {pkg.code}
                     </div>
@@ -407,29 +424,45 @@ export default function AdminPricing() {
 
                   <div className="p-5 space-y-3">
                     <div>
-                      <h4 className="text-base font-extrabold font-serif-title text-slate-900 leading-snug">{pkg.name}</h4>
-                      <p className="text-xs text-slate-500 mt-1 font-medium">{pkg.subtitle}</p>
+                      <h4 className="text-base font-extrabold font-serif-title text-slate-900 leading-snug">
+                        {pkg.name}
+                      </h4>
+                      <p className="text-xs text-slate-500 mt-1 font-medium">
+                        {pkg.subtitle}
+                      </p>
                     </div>
 
                     <div className="bg-amber-50 p-3 rounded-2xl border border-amber-100 flex items-center justify-between">
                       <div>
-                        <span className="text-[10px] font-bold text-slate-500 uppercase block">Giá Gói Trọn Gói</span>
-                        <span className="text-base font-black text-amber-900">{formatVND(pkg.basePricePerPerson)}</span>
-                        <span className="text-[10px] font-bold text-slate-500"> / người</span>
+                        <span className="text-[10px] font-bold text-slate-500 uppercase block">
+                          Giá Gói Trọn Gói
+                        </span>
+                        <span className="text-base font-black text-amber-900">
+                          {formatVND(pkg.basePricePerPerson)}
+                        </span>
+                        <span className="text-[10px] font-bold text-slate-500">
+                          {" "}
+                          / người
+                        </span>
                       </div>
                       <div className="text-right">
-                        <span className="text-[10px] font-bold text-slate-500 uppercase block">Tiền Cọc Giữ Lịch</span>
-                        <span className="text-xs font-extrabold text-slate-800">{formatVND(pkg.deposit)}</span>
+                        <span className="text-[10px] font-bold text-slate-500 uppercase block">
+                          Tiền Cọc Giữ Lịch
+                        </span>
+                        <span className="text-xs font-extrabold text-slate-800">
+                          {formatVND(pkg.deposit)}
+                        </span>
                       </div>
                     </div>
 
                     <div className="text-xs text-slate-600 space-y-1 pt-1">
-                      {Array.isArray(pkg.features) && pkg.features.map((feat, idx) => (
-                        <div key={idx} className="flex items-center gap-1.5">
-                          <Check className="w-3.5 h-3.5 text-amber-600 flex-shrink-0" />
-                          <span className="line-clamp-1">{feat}</span>
-                        </div>
-                      ))}
+                      {Array.isArray(pkg.features) &&
+                        pkg.features.map((feat, idx) => (
+                          <div key={idx} className="flex items-center gap-1.5">
+                            <Check className="w-3.5 h-3.5 text-amber-600 flex-shrink-0" />
+                            <span className="line-clamp-1">{feat}</span>
+                          </div>
+                        ))}
                     </div>
                   </div>
                 </div>
@@ -456,10 +489,12 @@ export default function AdminPricing() {
       )}
 
       {/* TAB 2: SERVICE ADDONS */}
-      {activeSubTab === 'addons' && (
+      {activeSubTab === "addons" && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Danh Sách Giá Dịch Vụ Đi Kèm & Phụ Phí</h3>
+            <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider">
+              Danh Sách Giá Dịch Vụ Đi Kèm & Phụ Phí
+            </h3>
             <button
               onClick={handleOpenAddonAdd}
               className="btn-gold px-4 py-2 text-xs font-extrabold flex items-center gap-2 shadow-sm"
@@ -480,9 +515,16 @@ export default function AdminPricing() {
               </thead>
               <tbody className="divide-y divide-slate-100 font-medium text-slate-800">
                 {addons.map((addon) => (
-                  <tr key={addon.id} className="hover:bg-amber-50/30 transition-colors">
-                    <td className="p-4 font-bold text-slate-900">{addon.name}</td>
-                    <td className="p-4 font-extrabold text-amber-800">{formatVND(addon.price)}</td>
+                  <tr
+                    key={addon.id}
+                    className="hover:bg-amber-50/30 transition-colors"
+                  >
+                    <td className="p-4 font-bold text-slate-900">
+                      {addon.name}
+                    </td>
+                    <td className="p-4 font-extrabold text-amber-800">
+                      {formatVND(addon.price)}
+                    </td>
                     <td className="p-4 text-right flex items-center justify-end gap-2">
                       <button
                         onClick={() => handleOpenAddonEdit(addon)}
@@ -507,10 +549,12 @@ export default function AdminPricing() {
       )}
 
       {/* TAB 3: PHOTOBOOTH CONCEPTS */}
-      {activeSubTab === 'photobooth' && (
+      {activeSubTab === "photobooth" && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Danh Sách Bảng Giá Khung Ảnh Photobooth</h3>
+            <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider">
+              Danh Sách Bảng Giá Khung Ảnh Photobooth
+            </h3>
             <button
               onClick={handleOpenPbAdd}
               className="btn-gold px-4 py-2 text-xs font-extrabold flex items-center gap-2 shadow-sm"
@@ -522,15 +566,24 @@ export default function AdminPricing() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {photobooth.map((pb) => (
-              <div key={pb.id} className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm flex flex-col justify-between hover:shadow-md transition-all">
+              <div
+                key={pb.id}
+                className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm flex flex-col justify-between hover:shadow-md transition-all"
+              >
                 <div>
                   <div className="relative aspect-[16/9] bg-slate-900 overflow-hidden">
                     {pb.image ? (
-                      <img src={pb.image} alt={pb.name} className="w-full h-full object-cover" />
+                      <img
+                        src={pb.image}
+                        alt={pb.name}
+                        className="w-full h-full object-cover"
+                      />
                     ) : (
                       <div className="w-full h-full flex flex-col items-center justify-center text-slate-500 bg-slate-100">
                         <ImageIcon className="w-8 h-8 opacity-40 mb-1" />
-                        <span className="text-[10px] font-bold">Chưa có ảnh mẫu</span>
+                        <span className="text-[10px] font-bold">
+                          Chưa có ảnh mẫu
+                        </span>
                       </div>
                     )}
                     <div className="absolute top-3 left-3 bg-amber-500 text-slate-950 font-black text-[10px] px-2.5 py-0.5 rounded-full shadow">
@@ -540,10 +593,16 @@ export default function AdminPricing() {
 
                   <div className="p-5 space-y-2">
                     <div className="flex items-center justify-between">
-                      <h4 className="text-sm font-extrabold text-slate-900">{pb.name}</h4>
-                      <span className="text-base font-black text-amber-900">{formatVND(pb.price)}</span>
+                      <h4 className="text-sm font-extrabold text-slate-900">
+                        {pb.name}
+                      </h4>
+                      <span className="text-base font-black text-amber-900">
+                        {formatVND(pb.price)}
+                      </span>
                     </div>
-                    <p className="text-xs text-slate-500 font-medium line-clamp-2">{pb.description}</p>
+                    <p className="text-xs text-slate-500 font-medium line-clamp-2">
+                      {pb.description}
+                    </p>
                   </div>
                 </div>
 
@@ -574,9 +633,14 @@ export default function AdminPricing() {
           <div className="bg-white rounded-3xl max-w-xl w-full p-6 shadow-2xl space-y-5 border border-slate-100 my-8">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <h3 className="text-base font-extrabold font-serif-title text-slate-900">
-                {editingPkg ? `Chỉnh Sửa Giá & Thông Tin (${editingPkg.code})` : 'Thêm Gói Chụp Ảnh Mới'}
+                {editingPkg
+                  ? `Chỉnh Sửa Giá & Thông Tin (${editingPkg.code})`
+                  : "Thêm Gói Chụp Ảnh Mới"}
               </h3>
-              <button onClick={() => setShowPkgModal(false)} className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500">
+              <button
+                onClick={() => setShowPkgModal(false)}
+                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500"
+              >
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -584,33 +648,45 @@ export default function AdminPricing() {
             <form onSubmit={handleSavePkg} className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-bold text-slate-700 block">Tên Gói Chụp</label>
+                  <label className="text-xs font-bold text-slate-700 block">
+                    Tên Gói Chụp
+                  </label>
                   <input
                     type="text"
                     required
                     value={pkgForm.name}
-                    onChange={(e) => setPkgForm({ ...pkgForm, name: e.target.value })}
+                    onChange={(e) =>
+                      setPkgForm({ ...pkgForm, name: e.target.value })
+                    }
                     className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold focus:ring-2 focus:ring-amber-500/20 outline-none"
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-slate-700 block">Mã Gói (Code)</label>
+                  <label className="text-xs font-bold text-slate-700 block">
+                    Mã Gói (Code)
+                  </label>
                   <input
                     type="text"
                     required
                     value={pkgForm.code}
-                    onChange={(e) => setPkgForm({ ...pkgForm, code: e.target.value })}
+                    onChange={(e) =>
+                      setPkgForm({ ...pkgForm, code: e.target.value })
+                    }
                     className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold focus:ring-2 focus:ring-amber-500/20 outline-none"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-xs font-bold text-slate-700 block">Tiêu Đề Phụ (Subtitle)</label>
+                <label className="text-xs font-bold text-slate-700 block">
+                  Tiêu Đề Phụ (Subtitle)
+                </label>
                 <input
                   type="text"
                   value={pkgForm.subtitle}
-                  onChange={(e) => setPkgForm({ ...pkgForm, subtitle: e.target.value })}
+                  onChange={(e) =>
+                    setPkgForm({ ...pkgForm, subtitle: e.target.value })
+                  }
                   className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-amber-500/20 outline-none"
                 />
               </div>
@@ -618,42 +694,71 @@ export default function AdminPricing() {
               {/* Price & Deposit Inputs */}
               <div className="grid grid-cols-2 gap-3 bg-amber-50/50 p-3 rounded-2xl border border-amber-100">
                 <div>
-                  <label className="text-xs font-extrabold text-amber-900 block">Đơn Giá Gói / Người (VNĐ)</label>
+                  <label className="text-xs font-extrabold text-amber-900 block">
+                    Đơn Giá Gói / Người (VNĐ)
+                  </label>
                   <input
                     type="number"
                     step="10000"
                     required
                     value={pkgForm.basePricePerPerson}
-                    onChange={(e) => setPkgForm({ ...pkgForm, basePricePerPerson: parseInt(e.target.value, 10) || 0 })}
+                    onChange={(e) =>
+                      setPkgForm({
+                        ...pkgForm,
+                        basePricePerPerson: parseInt(e.target.value, 10) || 0,
+                      })
+                    }
                     className="w-full px-3 py-2 rounded-xl border border-amber-300 text-xs font-black text-amber-900 focus:ring-2 focus:ring-amber-500/20 outline-none"
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-slate-700 block">Tiền Cọc Giữ Lịch (VNĐ)</label>
+                  <label className="text-xs font-bold text-slate-700 block">
+                    Tiền Cọc Giữ Lịch (VNĐ)
+                  </label>
                   <input
                     type="number"
                     step="10000"
                     required
                     value={pkgForm.deposit}
-                    onChange={(e) => setPkgForm({ ...pkgForm, deposit: parseInt(e.target.value, 10) || 0 })}
+                    onChange={(e) =>
+                      setPkgForm({
+                        ...pkgForm,
+                        deposit: parseInt(e.target.value, 10) || 0,
+                      })
+                    }
                     className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-extrabold focus:ring-2 focus:ring-amber-500/20 outline-none"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-xs font-bold text-slate-700 block">Các Ưu Đãi Bao Gồm (Mỗi dòng 1 ý)</label>
+                <label className="text-xs font-bold text-slate-700 block">
+                  Các Ưu Đãi Bao Gồm (Mỗi dòng 1 ý)
+                </label>
                 <textarea
                   rows={4}
                   value={pkgForm.featuresText}
-                  onChange={(e) => setPkgForm({ ...pkgForm, featuresText: e.target.value })}
+                  onChange={(e) =>
+                    setPkgForm({ ...pkgForm, featuresText: e.target.value })
+                  }
                   className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-amber-500/20 outline-none"
                 />
               </div>
 
               <div className="pt-3 border-t border-slate-100 flex justify-end gap-2">
-                <button type="button" onClick={() => setShowPkgModal(false)} className="px-4 py-2 rounded-xl bg-slate-100 text-xs font-bold">Hủy</button>
-                <button type="submit" className="btn-gold px-5 py-2 text-xs font-extrabold">Lưu Bảng Giá</button>
+                <button
+                  type="button"
+                  onClick={() => setShowPkgModal(false)}
+                  className="px-4 py-2 rounded-xl bg-slate-100 text-xs font-bold"
+                >
+                  Hủy
+                </button>
+                <button
+                  type="submit"
+                  className="btn-gold px-5 py-2 text-xs font-extrabold"
+                >
+                  Lưu Bảng Giá
+                </button>
               </div>
             </form>
           </div>
@@ -666,40 +771,65 @@ export default function AdminPricing() {
           <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4 border border-slate-100">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <h3 className="text-base font-extrabold font-serif-title text-slate-900">
-                {editingAddon ? 'Chỉnh Sửa Giá Phụ Phí' : 'Thêm Dịch Vụ Đi Kèm'}
+                {editingAddon ? "Chỉnh Sửa Giá Phụ Phí" : "Thêm Dịch Vụ Đi Kèm"}
               </h3>
-              <button onClick={() => setShowAddonModal(false)} className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500">
+              <button
+                onClick={() => setShowAddonModal(false)}
+                className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500"
+              >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             <form onSubmit={handleSaveAddon} className="space-y-3">
               <div>
-                <label className="text-xs font-bold text-slate-700 block">Tên Dịch Vụ Đi Kèm</label>
+                <label className="text-xs font-bold text-slate-700 block">
+                  Tên Dịch Vụ Đi Kèm
+                </label>
                 <input
                   type="text"
                   required
                   value={addonForm.name}
-                  onChange={(e) => setAddonForm({ ...addonForm, name: e.target.value })}
+                  onChange={(e) =>
+                    setAddonForm({ ...addonForm, name: e.target.value })
+                  }
                   className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold focus:ring-2 focus:ring-amber-500/20 outline-none"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-extrabold text-amber-900 block">Đơn Giá Phụ Phí (VNĐ)</label>
+                <label className="text-xs font-extrabold text-amber-900 block">
+                  Đơn Giá Phụ Phí (VNĐ)
+                </label>
                 <input
                   type="number"
                   step="10000"
                   required
                   value={addonForm.price}
-                  onChange={(e) => setAddonForm({ ...addonForm, price: parseInt(e.target.value, 10) || 0 })}
+                  onChange={(e) =>
+                    setAddonForm({
+                      ...addonForm,
+                      price: parseInt(e.target.value, 10) || 0,
+                    })
+                  }
                   className="w-full px-3 py-2 rounded-xl border border-amber-300 text-xs font-black text-amber-900 focus:ring-2 focus:ring-amber-500/20 outline-none"
                 />
               </div>
 
               <div className="pt-3 border-t border-slate-100 flex justify-end gap-2">
-                <button type="button" onClick={() => setShowAddonModal(false)} className="px-4 py-2 rounded-xl bg-slate-100 text-xs font-bold">Hủy</button>
-                <button type="submit" className="btn-gold px-5 py-2 text-xs font-extrabold">Lưu Thay Đổi</button>
+                <button
+                  type="button"
+                  onClick={() => setShowAddonModal(false)}
+                  className="px-4 py-2 rounded-xl bg-slate-100 text-xs font-bold"
+                >
+                  Hủy
+                </button>
+                <button
+                  type="submit"
+                  className="btn-gold px-5 py-2 text-xs font-extrabold"
+                >
+                  Lưu Thay Đổi
+                </button>
               </div>
             </form>
           </div>
@@ -712,65 +842,95 @@ export default function AdminPricing() {
           <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4 border border-slate-100">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <h3 className="text-base font-extrabold font-serif-title text-slate-900">
-                {editingPb ? `Chỉnh Sửa Giá Photobooth (${editingPb.code})` : 'Thêm Khung Ảnh Photobooth Mới'}
+                {editingPb
+                  ? `Chỉnh Sửa Giá Photobooth (${editingPb.code})`
+                  : "Thêm Khung Ảnh Photobooth Mới"}
               </h3>
-              <button onClick={() => setShowPbModal(false)} className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500">
+              <button
+                onClick={() => setShowPbModal(false)}
+                className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500"
+              >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             <form onSubmit={handleSavePb} className="space-y-3">
               <div>
-                <label className="text-xs font-bold text-slate-700 block">Tên Khung Ảnh Photobooth</label>
+                <label className="text-xs font-bold text-slate-700 block">
+                  Tên Khung Ảnh Photobooth
+                </label>
                 <input
                   type="text"
                   required
                   value={pbForm.name}
-                  onChange={(e) => setPbForm({ ...pbForm, name: e.target.value })}
+                  onChange={(e) =>
+                    setPbForm({ ...pbForm, name: e.target.value })
+                  }
                   className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold focus:ring-2 focus:ring-amber-500/20 outline-none"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-bold text-slate-700 block">Mã Khung Ảnh</label>
+                <label className="text-xs font-bold text-slate-700 block">
+                  Mã Khung Ảnh
+                </label>
                 <input
                   type="text"
                   required
                   value={pbForm.code}
-                  onChange={(e) => setPbForm({ ...pbForm, code: e.target.value })}
+                  onChange={(e) =>
+                    setPbForm({ ...pbForm, code: e.target.value })
+                  }
                   className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold focus:ring-2 focus:ring-amber-500/20 outline-none"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-bold text-slate-700 block">Mô Tả Kiểu Dáng</label>
+                <label className="text-xs font-bold text-slate-700 block">
+                  Mô Tả Kiểu Dáng
+                </label>
                 <input
                   type="text"
                   value={pbForm.description}
-                  onChange={(e) => setPbForm({ ...pbForm, description: e.target.value })}
+                  onChange={(e) =>
+                    setPbForm({ ...pbForm, description: e.target.value })
+                  }
                   className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-amber-500/20 outline-none"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-extrabold text-amber-900 block">Đơn Giá / Dải Ảnh (VNĐ)</label>
+                <label className="text-xs font-extrabold text-amber-900 block">
+                  Đơn Giá / Dải Ảnh (VNĐ)
+                </label>
                 <input
                   type="number"
                   step="5000"
                   required
                   value={pbForm.price}
-                  onChange={(e) => setPbForm({ ...pbForm, price: parseInt(e.target.value, 10) || 0 })}
+                  onChange={(e) =>
+                    setPbForm({
+                      ...pbForm,
+                      price: parseInt(e.target.value, 10) || 0,
+                    })
+                  }
                   className="w-full px-3 py-2 rounded-xl border border-amber-300 text-xs font-black text-amber-900 focus:ring-2 focus:ring-amber-500/20 outline-none"
                 />
               </div>
 
               {/* Image Upload & Preview Box */}
               <div className="space-y-2 bg-slate-50 p-3.5 rounded-2xl border border-slate-200">
-                <label className="text-xs font-bold text-slate-800 block">Ảnh Mẫu Khung Photobooth</label>
-                
+                <label className="text-xs font-bold text-slate-800 block">
+                  Ảnh Mẫu Khung Photobooth
+                </label>
+
                 {pbForm.image && (
                   <div className="relative aspect-[16/9] rounded-xl overflow-hidden bg-slate-900 border border-slate-200">
-                    <img src={pbForm.image} alt="Preview" className="w-full h-full object-cover" />
+                    <img
+                      src={pbForm.image}
+                      alt="Preview"
+                      className="w-full h-full object-cover"
+                    />
                     <span className="absolute bottom-2 left-2 bg-slate-950/80 text-amber-400 font-bold text-[10px] px-2 py-0.5 rounded-md backdrop-blur-sm">
                       Ảnh mẫu xem trước
                     </span>
@@ -781,14 +941,30 @@ export default function AdminPricing() {
                   <label className="flex-1 btn-gold py-2 px-3 text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-sm">
                     <Upload className="w-4 h-4" />
                     <span>Chọn Ảnh Từ Máy Tính</span>
-                    <input type="file" accept="image/*" onChange={handlePbImageUpload} className="hidden" />
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handlePbImageUpload}
+                      className="hidden"
+                    />
                   </label>
                 </div>
               </div>
 
               <div className="pt-3 border-t border-slate-100 flex justify-end gap-2">
-                <button type="button" onClick={() => setShowPbModal(false)} className="px-4 py-2 rounded-xl bg-slate-100 text-xs font-bold">Hủy</button>
-                <button type="submit" className="btn-gold px-5 py-2 text-xs font-extrabold">Lưu Bảng Giá & Ảnh Vào SQL</button>
+                <button
+                  type="button"
+                  onClick={() => setShowPbModal(false)}
+                  className="px-4 py-2 rounded-xl bg-slate-100 text-xs font-bold"
+                >
+                  Hủy
+                </button>
+                <button
+                  type="submit"
+                  className="btn-gold px-5 py-2 text-xs font-extrabold"
+                >
+                  Lưu bảng giá và hình ảnh
+                </button>
               </div>
             </form>
           </div>
