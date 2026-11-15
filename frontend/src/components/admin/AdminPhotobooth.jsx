@@ -595,7 +595,8 @@ export default function AdminPhotobooth({ refreshKey = 0 }) {
                   <input
                     type="number"
                     required
-                    step="5000"
+                    min="1"
+                    step="1"
                     value={formData.price}
                     onChange={(e) =>
                       setFormData({
