@@ -70,7 +70,7 @@ Migration thêm `line_items`, `security_deposit`, `amount_paid`, `resource_id`, 
 - Khóa mã giao dịch + đơn hàng; cộng mỗi giao dịch đúng một lần. Callback muộn/đơn hủy/hoàn tất/tắt auto-confirm được lưu và đánh dấu kiểm tra; không chiếm lại lịch hết hạn.
 - Khi tắt auto-confirm, admin kiểm tra tiền đã ghi nhận rồi xác nhận trạng thái; không nhập cùng tiền thành giao dịch mới.
 - Ghi nhận thủ công là ghi sổ nội bộ, không chuyển tiền ngân hàng. Cần đối chiếu giao dịch thật.
-- QR theo [Quick Link chính thức VietQR](https://www.vietqr.io/qr-dong); hỗ trợ mã template riêng. Tài liệu đọc ngày rework yêu cầu template riêng khi dùng chính thức; `compact2` dùng preview. QR lỗi vẫn có tài khoản/số tiền/nội dung.
+- Chế độ QR động dùng [VietQR qua SePay](https://developer.sepay.vn/vi/tien-ich-khac/tao-qr-code) tại `vietqr.app/img`, gửi số tài khoản đã cấu hình, mã BIN, khoản giữ chỗ còn thiếu và nội dung đơn. Chế độ ảnh QR riêng vẫn dùng ảnh đã tải. QR lỗi vẫn có thông tin chuyển khoản thủ công.
 - Không gửi email khi vừa giữ chỗ. Chưa có outbox/email sau thanh toán, refund/hoàn cọc tự động. Cọc trong báo cáo là số đã nhận theo đơn hiệu lực, chưa phải sổ công nợ hoàn cọc.
 
 Compose đã bỏ credential SMTP viết cứng trong file cũ. Nếu credential đó từng dùng thật, cần thay ở nhà cung cấp email; xóa khỏi file hiện tại không xóa lịch sử Git.

@@ -913,7 +913,6 @@ function PaymentSettings() {
               ["bankBin", "Mã BIN ngân hàng"],
               ["accountNumber", "Số tài khoản"],
               ["accountHolder", "Chủ tài khoản"],
-              ["qrTemplate", "Mã template VietQR"],
             ].map(([key, label]) => (
               <label className="field" key={key}>
                 {label}
@@ -935,7 +934,7 @@ function PaymentSettings() {
                   setConfig({ ...config, qrType: e.target.value })
                 }
               >
-                <option value="dynamic">QR theo mã đơn và số tiền</option>
+                <option value="dynamic">VietQR qua SePay theo mã đơn và số tiền</option>
                 <option value="custom_image">Ảnh QR của studio</option>
               </select>
             </label>

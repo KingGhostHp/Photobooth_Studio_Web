@@ -25,6 +25,7 @@ import { Modal, Button, Empty, Eyebrow } from "./UI";
 import { Dropdown } from "./Dropdown";
 import { DatePicker } from "./DatePicker";
 import { addDays } from "./date-utils";
+import { paymentQrUrl } from "./payment-qr";
 
 export function OrderSummary({ order }) {
   const total = order.totalAmount + order.securityDeposit + order.penaltyFee;
@@ -105,7 +106,7 @@ export default function Checkout({ items, onChange, onClose, onDone }) {
   const [now, setNow] = useState(Date.now());
   const [statusError, setStatusError] = useState("");
   const [copied, setCopied] = useState(false);
-  const [qrError, setQrError] = useState(false);
+  const [failedQr, setFailedQr] = useState(null);
   const request = useRef({ id: crypto.randomUUID(), payload: "" });
   const scheduled = items.find((i) => i.type !== "costume");
   const resource = scheduled?.type === "photobooth" ? "photobooth" : "studio";
@@ -267,12 +268,7 @@ export default function Checkout({ items, onChange, onClose, onDone }) {
     ? Math.max(0, order.depositAmount - order.amountPaid)
     : 0;
   const syntax = order ? `AURA ${order.id.replaceAll("-", "")}` : "";
-  const qr =
-    bank && order
-      ? bank.qrType === "custom_image" && bank.customQrImage
-        ? bank.customQrImage
-        : `https://img.vietqr.io/image/${bank.bankBin}-${bank.accountNumber}-${bank.qrTemplate || "compact2"}.svg?accountName=${encodeURIComponent(bank.accountHolder)}&amount=${remainingDeposit}&addInfo=${encodeURIComponent(syntax)}`
-      : null;
+  const qr = paymentQrUrl(bank, remainingDeposit, syntax);
   return (
     <Modal
       title={ticket ? "Lịch hẹn của bạn" : "Giỏ dịch vụ"}
@@ -315,16 +311,18 @@ export default function Checkout({ items, onChange, onClose, onDone }) {
                         : "Đã nhận đủ khoản giữ chỗ"}
                     </strong>
                     {remainingDeposit > 0 &&
-                      (qr && !qrError ? (
+                      (qr && qr !== failedQr ? (
                         <img
+                          key={qr}
                           className="payment-qr"
                           src={qr}
                           alt="QR chuyển khoản giữ chỗ"
-                          onError={() => setQrError(true)}
+                          referrerPolicy="no-referrer"
+                          onError={() => setFailedQr(qr)}
                         />
                       ) : (
                         <p className="muted">
-                          {qrError
+                          {bank
                             ? "QR chưa tải được. Bạn có thể chuyển khoản theo thông tin bên dưới."
                             : "Đang tải thông tin tài khoản…"}
                         </p>
