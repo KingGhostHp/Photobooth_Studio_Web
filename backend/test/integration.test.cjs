@@ -94,6 +94,7 @@ if (!enabled) {
     registerStudio(app, pool);
     registerAnalytics(app, pool);
     registerCostumes(app, pool);
+    app.get("/api/health", (req, res) => res.json({ status: "OK" }));
     app.use((err, req, res, next) =>
       res
         .status(err.status || 500)
@@ -113,9 +114,19 @@ if (!enabled) {
     assert.equal(data.totalOrders, 0);
     assert.equal(data.totalVisitorsAllTime, 0);
   });
+  test("the public health check accepts GET and HEAD without a session", async () => {
+    assert.equal((await request("/api/health")).status, 200);
+    const head = await fetch(`${base}/api/health`, { method: "HEAD" });
+    assert.equal(head.status, 200);
+    assert.equal(await head.text(), "");
+  });
   test("administrator access, CSRF, private cookies and logout", async () => {
     assert.equal((await request("/api/admin/orders")).status, 401);
     assert.equal((await request("/api/analytics/summary")).status, 401);
+    const privateHead = await fetch(`${base}/api/costumes?all=true`, {
+      method: "HEAD",
+    });
+    assert.equal(privateHead.status, 401);
     assert.equal(
       (
         await request("/api/auth/login", {

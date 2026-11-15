@@ -634,8 +634,10 @@ function registerStudio(app, pool) {
       "/banners",
       "/payment/bank-config",
     ];
+    const isPublicRead =
+      req.method === "GET" || (req.method === "HEAD" && req.path === "/health");
     if (
-      req.method === "GET" &&
+      isPublicRead &&
       (publicGet.includes(req.path) || /^\/costumes\/[^/]+$/.test(req.path)) &&
       req.query.all !== "true"
     )
